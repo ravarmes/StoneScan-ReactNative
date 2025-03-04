@@ -1,8 +1,39 @@
-# StoneScan App
+<h1 align="center">
+    <img alt="Fapes" src="assets/logo-fapes.png" width="300" />
+    <img alt="Granimaster" src="assets/logo-granimaster.png" width="300" />
+</h1>
 
-Um aplicativo móvel desenvolvido com React Native e Expo para identificação e catalogação de rochas ornamentais, como granitos e mármores.
+<h3 align="center">
+  StoneScan: Identificação Inteligente de Rochas Ornamentais
+</h3>
 
-## Funcionalidades
+<p align="center">Aplicativo de reconhecimento de rochas ornamentais utilizando inteligência artificial e visão computacional.</p>
+
+<p align="center">
+  <img alt="GitHub language count" src="https://img.shields.io/github/languages/count/ravarmes/StoneScan-ReactNative?color=%2304D361">
+
+  <a href="http://www.linkedin.com/in/rafael-vargas-mesquita">
+    <img alt="Made by Rafael Vargas Mesquita" src="https://img.shields.io/badge/made%20by-Rafael%20Vargas%20Mesquita-%2304D361">
+  </a>
+
+  <img alt="License" src="https://img.shields.io/badge/license-MIT-%2304D361">
+
+  <a href="https://github.com/ravarmes/StoneScan-ReactNative/stargazers">
+    <img alt="Stargazers" src="https://img.shields.io/github/stars/ravarmes/StoneScan-ReactNative?style=social">
+  </a>
+</p>
+
+## :page_with_curl: Sobre o Projeto <a name="-about"/></a>
+
+O StoneScan é um aplicativo móvel inovador que utiliza inteligência artificial para identificar rochas ornamentais através de fotografias tiradas por smartphones. Desenvolvido para atender tanto profissionais do setor quanto consumidores finais, o aplicativo emprega redes neurais avançadas para reconhecer e classificar diferentes tipos de rochas, como granitos e mármores, a partir de imagens de superfícies como pias, pisos e paredes.
+
+O projeto é resultado de uma colaboração multidisciplinar entre estudantes de Sistemas de Informação e Técnico em Mineração, sob orientação docente. As informações sobre as rochas são baseadas em fontes autorizadas, incluindo o manual de rochas ornamentais do SindRochas e dados fornecidos por empresas parceiras do setor.
+
+### :notebook_with_decorative_cover: Arquitetura do Sistema <a name="-architecture"/></a>
+
+<img src="assets/architecture.png" width="700">
+
+### Funcionalidades
 
 - 📸 Identificação de rochas através de fotos
 - 📚 Catálogo detalhado de rochas ornamentais
@@ -12,7 +43,7 @@ Um aplicativo móvel desenvolvido com React Native e Expo para identificação e
 - 🔍 Histórico de identificações
 - 📤 Compartilhamento de resultados
 
-## Características das Rochas
+### Características das Rochas
 
 Para cada rocha, o aplicativo fornece:
 - Descrição detalhada
@@ -21,18 +52,18 @@ Para cada rocha, o aplicativo fornece:
 - Instruções de manutenção
 - Sistema de avaliação pessoal
 
-## Requisitos Técnicos
+### Requisitos Técnicos
 
 - Node.js 14.x ou superior
 - Expo CLI
 - React Native
 - Expo Go App (para desenvolvimento)
 
-## Instalação
+### Como Executar
 
 1. Clone o repositório:
 ```bash
-git clone [url-do-repositorio]
+git clone https://github.com/ravarmes/StoneScan-ReactNative.git
 ```
 
 2. Instale as dependências:
@@ -47,7 +78,7 @@ npx expo start
 
 4. Use o Expo Go em seu dispositivo móvel para escanear o QR Code
 
-## Estrutura do Projeto
+### Estrutura do Projeto
 
 ```
 StoneScanApp/
@@ -61,7 +92,7 @@ StoneScanApp/
 └── package.json       # Dependências
 ```
 
-## Tecnologias Utilizadas
+### Tecnologias Utilizadas
 
 - React Native
 - Expo
