@@ -1,0 +1,35 @@
+{
+  "name": "stonescanapp2",
+  "version": "1.0.0",
+  "description": "StoneScan is an innovative mobile application that identifies ornamental rocks through photos taken with smartphones. Using artificial intelligence and neural networks, the app can recognize and name types of rocks, such as granite and marble, from images of surfaces like countertops, floors, and walls.",
+  "main": "node_modules/expo/AppEntry.js",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@expo/webpack-config": "^19.0.0",
+    "@react-native-async-storage/async-storage": "^1.18.2",
+    "@react-navigation/bottom-tabs": "^6.6.1",
+    "@react-navigation/native": "^6.1.18",
+    "@react-navigation/stack": "^6.4.1",
+    "expo": "~49.0.15",
+    "expo-camera": "~13.4.4",
+    "expo-image-picker": "~14.3.2",
+    "expo-status-bar": "~1.6.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-native": "^0.72.10",
+    "react-native-gesture-handler": "~2.12.0",
+    "react-native-reanimated": "~3.3.0",
+    "react-native-safe-area-context": "^4.6.3",
+    "react-native-screens": "~3.22.0",
+    "react-native-vector-icons": "^10.2.0",
+    "react-native-web": "^0.19.6"
+  }
+}
