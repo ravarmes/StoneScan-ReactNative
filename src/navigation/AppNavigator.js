@@ -7,6 +7,7 @@ import { Ionicons } from '@expo/vector-icons';
 import HomeScreen from '../screens/HomeScreen';
 import ScanScreen from '../screens/ScanScreen';
 import ResultScreen from '../screens/ResultScreen';
+import AboutScreen from '../screens/AboutScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -33,6 +34,19 @@ const ScanStack = () => {
       }}
     >
       <Stack.Screen name="ScanMain" component={ScanScreen} />
+    </Stack.Navigator>
+  );
+};
+
+// Stack navigator for the About screen
+const AboutStack = () => {
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        headerShown: false,
+      }}
+    >
+      <Stack.Screen name="AboutMain" component={AboutScreen} />
     </Stack.Navigator>
   );
 };
@@ -66,6 +80,8 @@ const TabNavigator = () => {
             iconName = focused ? 'home' : 'home-outline';
           } else if (route.name === 'Scan') {
             iconName = focused ? 'scan' : 'scan-outline';
+          } else if (route.name === 'Sobre') {
+            iconName = focused ? 'information-circle' : 'information-circle-outline';
           }
 
           return <Ionicons name={iconName} size={size} color={color} />;
@@ -77,6 +93,7 @@ const TabNavigator = () => {
     >
       <Tab.Screen name="Home" component={HomeStack} />
       <Tab.Screen name="Scan" component={ScanStack} />
+      <Tab.Screen name="Sobre" component={AboutStack} />
     </Tab.Navigator>
   );
 };
