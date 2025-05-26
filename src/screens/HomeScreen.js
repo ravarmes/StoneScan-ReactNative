@@ -20,54 +20,46 @@ import { useScanHistory } from '../services/ScanHistoryContext';
 const rockData = [
   {
     id: '1',
-    name: 'Granito Amarelo Capri',
-    image: require('../assets/images/granito-amarelo-capri.jpg'),
-    description: 'Granito de cor amarela com padrão uniforme.',
+    name: 'Granito Branco Itaúnas',
+    image: require('../assets/images/granito-branco-itaunas.jpg'),
+    description: 'Granito de cor clara, com tons branco-bege e grãos finos. ',
     category: 'Granito',
     rating: 4.5
   },
   {
     id: '2',
-    name: 'Granito Amarelo Florença',
-    image: require('../assets/images/granito-amarelo-florenca.jpg'),
-    description: 'Granito amarelo com padrão delicado.',
+    name: 'Granito Branco Kashmir',
+    image: require('../assets/images/granito-branco-kashmir.jpg'),
+    description: 'Granito de cor clara com veios acinzentados e avermelhados.',
     category: 'Granito',
     rating: 4.3
   },
   {
     id: '3',
-    name: 'Granito Amarelo Ouro Brasil',
-    image: require('../assets/images/granito-amarelo-ouro-brasil.jpg'),
-    description: 'Granito dourado com padrão exuberante.',
+    name: 'Granito Cinza Castelo',
+    image: require('../assets/images/granito-cinza-castelo.jpg'),
+    description: 'Granito de tonalidade cinza médio com grãos uniformes.',
     category: 'Granito',
     rating: 4.7
   },
   {
     id: '4',
-    name: 'Granito Amêndoa Jaciguá',
-    image: require('../assets/images/granito-amendoa-jacigua.jpg'),
-    description: 'Granito de tonalidade amêndoa.',
+    name: 'Granito Preto Via Láctea',
+    image: require('../assets/images/granito-via-lactea.jpg'),
+    description: 'Granito preto com veios brancos e cinzas.',
     category: 'Granito',
     rating: 4.4
   },
   {
     id: '5',
-    name: 'Granito Bege Butterfly',
-    image: require('../assets/images/granito-bege-butterfly.jpg'),
-    description: 'Granito bege com padrão delicado.',
+    name: 'Granito Preto Absoluto',
+    image: require('../assets/images/granito-preto-absoluto.jpg'),
+    description: 'Granito de cor preta uniforme.',
     category: 'Granito',
     rating: 4.6
   },
   {
     id: '6',
-    name: 'Granito Gold 500',
-    image: require('../assets/images/granito-gold-500.jpg'),
-    description: 'Granito dourado com padrão único.',
-    category: 'Granito',
-    rating: 4.5
-  },
-  {
-    id: '7',
     name: 'Granito Preto São Gabriel',
     image: require('../assets/images/granito-preto-sao-gabriel.jpg'),
     description: 'Granito preto com alta resistência.',
@@ -75,7 +67,7 @@ const rockData = [
     rating: 4.8
   },
   {
-    id: '8',
+    id: '7',
     name: 'Mármore Branco Clássico',
     image: require('../assets/images/marmore-branco-classico.jpg'),
     description: 'Mármore branco clássico e elegante.',
@@ -83,7 +75,7 @@ const rockData = [
     rating: 4.9
   },
   {
-    id: '9',
+    id: '8',
     name: 'Mármore Cachoeiro White',
     image: require('../assets/images/marmore-cachoeiro-white.jpg'),
     description: 'Mármore branco de Cachoeiro.',
@@ -91,7 +83,7 @@ const rockData = [
     rating: 4.7
   },
   {
-    id: '10',
+    id: '9',
     name: 'Mármore Chocolate',
     image: require('../assets/images/marmore-chocolate.jpg'),
     description: 'Mármore de tonalidade chocolate.',
@@ -99,7 +91,7 @@ const rockData = [
     rating: 4.6
   },
   {
-    id: '11',
+    id: '10',
     name: 'Mármore Imperial Pink',
     image: require('../assets/images/marmore-imperial-pink.jpg'),
     description: 'Mármore rosa imperial exclusivo.',
@@ -107,7 +99,7 @@ const rockData = [
     rating: 4.8
   },
   {
-    id: '12',
+    id: '11',
     name: 'Mármore Pinta Verde',
     image: require('../assets/images/marmore-pinta-verde.jpg'),
     description: 'Mármore com detalhes em verde.',

@@ -16,126 +16,107 @@ import { useUserRatings } from '../services/UserRatingsContext';
 
 // Mock rock data
 const rockDetails = {
-  'Granito Amarelo Capri': {
-    description: 'Granito de cor amarela com padrão uniforme, ideal para ambientes internos.',
+  'Granito Branco Itaúnas': {
+    description: 'Rocha ornamental de cor clara, com tons branco-bege e grãos finos. Muito usado em ambientes internos por sua aparência elegante e uniforme.',
     characteristics: [
       { name: 'Tipo', value: 'Granito' },
-      { name: 'Cor predominante', value: 'Amarelo' },
-      { name: 'Densidade Aparente', value: '2606 kg/m³' },
-      { name: 'Absorção d\'água', value: '0,51%' },
-      { name: 'Porosidade Aparente', value: '1,34%' },
-      { name: 'Flexão', value: '8,78 MPa' },
+      { name: 'Cor predominante', value: 'Branco' },
+      { name: 'Densidade Aparente', value: '2614 kg/m³' },
+      { name: 'Absorção d\'água', value: '0,37%' },
+      { name: 'Porosidade Aparente', value: '0,96%' },
+      { name: 'Flexão', value: '9,38 MPa' },
     ],
     applications: [
-      'Revestimentos interiores de paredes',
-      'Divisórias',
-      'Pisos de baixo tráfego',
-      'Escadas',
+      'Paredes e divisórias',
+      'Pisos e escadas',
+      'Pavimentos de baixo tráfego',
+      'Revestimentos exteriores secos',
       'Bancadas (com impermeabilização)',
     ],
-    maintenance: 'Limpe com água e sabão neutro. Evite produtos ácidos ou abrasivos. Recomenda-se aplicar impermeabilizante a cada 12 meses.'
+    maintenance: 'A limpeza deve ser feita com pano úmido e detergente neutro, evitando excesso de água e produtos agressivos. Substâncias manchantes devem ser removidas imediatamente.'
   },
-  'Granito Amarelo Florença': {
-    description: 'Granito amarelo com padrão delicado, perfeito para ambientes sofisticados.',
+  'Granito Branco Kashmir': {
+    description: 'Rocha clara com veios acinzentados e avermelhados, valorizada por sua elegância e durabilidade.',
     characteristics: [
       { name: 'Tipo', value: 'Granito' },
-      { name: 'Cor predominante', value: 'Amarelo' },
-      { name: 'Densidade Aparente', value: '2644 kg/m³' },
-      { name: 'Absorção d\'água', value: '0,38%' },
-      { name: 'Porosidade Aparente', value: '1,00%' },
-      { name: 'Flexão', value: '7,42 MPa' },
+      { name: 'Cor predominante', value: 'Branco' },
+      { name: 'Densidade Aparente', value: '2700 a 2800 kg/m³' },
+      { name: 'Absorção d\'água', value: '0,09% a 0,41%' },
+      { name: 'Porosidade Aparente', value: '1,2%' },
+      { name: 'Flexão', value: '9 a 11,25 MPa' },
     ],
     applications: [
-      'Revestimentos interiores de paredes',
-      'Divisórias',
-      'Pisos de baixo tráfego',
-      'Escadas',
-      'Bancadas (com impermeabilização)',
+      'Bancadas de cozinha e banheiro',
+      'Revestimentos internos de pisos e paredes',
+      'Escadas e soleiras',
+      'Fachadas externas (com impermeabilização)',
+      'Tampos de móveis e mesas',
     ],
-    maintenance: 'Limpe com água e sabão neutro. Evite produtos ácidos ou abrasivos. Recomenda-se aplicar impermeabilizante a cada 12 meses.'
+    maintenance: 'Limpeza com pano úmido e detergente neutro, evitando produtos ácidos ou abrasivos. Recomenda-se reaplicar o selante periodicamente para preservar a proteção contra manchas.'
   },
-  'Granito Amarelo Ouro Brasil': {
-    description: 'Granito dourado com padrão exuberante, adequado para ambientes internos e externos.',
+  'Granito Cinza Castelo': {
+    description: 'Pedra de tonalidade cinza médio com grãos uniformes, valorizada por sua resistência e aparência sóbria. Ideal para revestimentos internos e externos.',
     characteristics: [
       { name: 'Tipo', value: 'Granito' },
-      { name: 'Cor predominante', value: 'Amarelo dourado' },
-      { name: 'Densidade Aparente', value: '2670 kg/m³' },
-      { name: 'Absorção d\'água', value: '0,32%' },
-      { name: 'Porosidade Aparente', value: '0,85%' },
-      { name: 'Flexão', value: '9,23 MPa' },
+      { name: 'Cor predominante', value: 'Cinza' },
+      { name: 'Densidade Aparente', value: '2657 kg/m³' },
+      { name: 'Absorção d\'água', value: '0,31%' },
+      { name: 'Porosidade Aparente', value: '0,83%' },
+      { name: 'Flexão', value: '17,37 MPa' },
     ],
     applications: [
-      'Revestimentos interiores',
-      'Revestimentos exteriores',
-      'Fachadas aeradas',
-      'Pisos de baixo tráfego',
+      'Revestimentos internos: paredes, divisórias',
+      'Pisos, escadas e pavimentos de baixo tráfego',
+      'Revestimentos externos com testes prévios',
+      'Fachadas com ensaios de durabilidadecadas',
       'Bancadas (com impermeabilização)',
     ],
-    maintenance: 'Limpe com água e sabão neutro. Evite produtos ácidos ou abrasivos. Recomenda-se aplicar impermeabilizante a cada 12 meses.'
+    maintenance: 'Limpe sistematicamente com pano úmido e detergente neutro, evitando excesso de água e produtos abrasivos ou químicos agressivos. Remova rapidamente substâncias manchantes e evite contato com materiais ferruginosos.'
   },
-  'Granito Amêndoa Jaciguá': {
-    description: 'Granito de tonalidade amêndoa, versátil para diversos ambientes internos.',
+  'Granito Preto Absoluto': {
+    description: 'Pedra natural de cor preta uniforme, reconhecida pela alta durabilidade e elegância. Ideal para ambientes internos e externos sofisticados.',
     characteristics: [
       { name: 'Tipo', value: 'Granito' },
-      { name: 'Cor predominante', value: 'Amêndoa' },
-      { name: 'Densidade Aparente', value: '2632 kg/m³' },
-      { name: 'Absorção d\'água', value: '0,41%' },
-      { name: 'Porosidade Aparente', value: '1,08%' },
-      { name: 'Flexão', value: '8,76 MPa' },
-    ],
-    applications: [
-      'Revestimentos interiores de paredes',
-      'Divisórias',
-      'Pisos de baixo tráfego',
-      'Escadas',
-      'Bancadas (com impermeabilização)',
-    ],
-    maintenance: 'Limpe com água e sabão neutro. Evite produtos ácidos ou abrasivos. Recomenda-se aplicar impermeabilizante a cada 12 meses.'
-  },
-  'Granito Bege Butterfly': {
-    description: 'Granito bege com padrão delicado, adequado para ambientes internos e externos.',
-    characteristics: [
-      { name: 'Tipo', value: 'Granito' },
-      { name: 'Cor predominante', value: 'Bege' },
-      { name: 'Densidade Aparente', value: '2632 kg/m³' },
-      { name: 'Absorção d\'água', value: '0,35%' },
-      { name: 'Porosidade Aparente', value: '0,92%' },
-      { name: 'Flexão', value: '11,43 MPa' },
+      { name: 'Cor predominante', value: 'Preto' },
+      { name: 'Densidade Aparente', value: '2960 a 3078 kg/m³' },
+      { name: 'Absorção d\'água', value: '0,02% a 0,10%' },
+      { name: 'Porosidade Aparente', value: '0,2% a 4%' },
+      { name: 'Flexão', value: '12 a 33,5 MPa' },
     ],
     applications: [
       'Revestimentos interiores',
       'Revestimentos exteriores',
-      'Fachadas aeradas',
-      'Pisos de baixo tráfego',
+      'Fachadas ventiladas',
+      'Pisos residenciais leves',
       'Bancadas (com impermeabilização)',
     ],
-    maintenance: 'Limpe com água e sabão neutro. Evite produtos ácidos ou abrasivos. Recomenda-se aplicar impermeabilizante a cada 12 meses.'
+    maintenance: 'impar com pano úmido e detergente neutro, evitando produtos abrasivos ou ácidos. Reaplicar selante regularmente para proteger contra manchas e desgaste.'
   },
-  'Granito Gold 500': {
-    description: 'Granito dourado com padrão único, versátil para ambientes internos e externos.',
-    characteristics: [
-      { name: 'Tipo', value: 'Granito' },
-      { name: 'Cor predominante', value: 'Dourado' },
-      { name: 'Densidade Aparente', value: '2641 kg/m³' },
-      { name: 'Absorção d\'água', value: '0,36%' },
-      { name: 'Porosidade Aparente', value: '0,94%' },
-      { name: 'Flexão', value: '8,92 MPa' },
-    ],
-    applications: [
-      'Revestimentos interiores',
-      'Revestimentos exteriores',
-      'Fachadas',
-      'Pisos de baixo tráfego',
-      'Bancadas (com impermeabilização)',
-    ],
-    maintenance: 'Limpe com água e sabão neutro. Evite produtos ácidos ou abrasivos. Recomenda-se aplicar impermeabilizante a cada 12 meses.'
-  },
+'Granito Preto Via Láctea': {
+  description: 'Granito brasileiro de fundo preto profundo com veios brancos e cinzas, lembrando o céu estrelado. Combina estética sofisticada e alta durabilidade.',
+  characteristics: [
+    { name: 'Tipo', value: 'Granito' },
+    { name: 'Cor predominante', value: 'Preto com veios brancos e cinzas' },
+    { name: 'Densidade Aparente', value: '2579 a 2960 kg/m³' },
+    { name: 'Absorção d\'água', value: '0,22%' },
+    { name: 'Porosidade Aparente', value: '0,3% a 1%' },
+    { name: 'Flexão', value: '10 a 33,5 MPa' }
+  ],
+  applications: [
+    'Bancadas de cozinha e banheiro',
+    'Pisos e revestimentos internos',
+    'Escadas e soleiras',
+    'Mesas e tampos de móveis',
+    'Fachadas ventiladas'
+  ],
+  maintenance: 'Limpar com pano úmido e detergente neutro, evitando produtos abrasivos ou ácidos. Aplicar selante periodicamente para proteger contra manchas e preservar o brilho.'
+},
   'Granito Preto São Gabriel': {
     description: 'Granito preto com alta resistência, ideal para diversos ambientes.',
     characteristics: [
       { name: 'Tipo', value: 'Granito' },
       { name: 'Cor predominante', value: 'Preto' },
-      { name: 'Densidade Aparente', value: '2660 kg/m³' },
+      { name: 'Densidade Aparente', value: '2960 kg/m³' },
       { name: 'Absorção d\'água', value: '0,33%' },
       { name: 'Porosidade Aparente', value: '0,96%' },
       { name: 'Flexão', value: '14,10 MPa' },
