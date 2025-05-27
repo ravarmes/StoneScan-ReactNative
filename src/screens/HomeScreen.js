@@ -76,33 +76,49 @@ const rockData = [
   },
   {
     id: '8',
-    name: 'Mármore Cachoeiro White',
-    image: require('../assets/images/marmore-cachoeiro-white.jpg'),
-    description: 'Mármore branco de Cachoeiro.',
+    name: 'Mármore Dolomítico Matarazzo',
+    image: require('../assets/images/marmore-dolomitico-matarazzo.jpg'),
+    description: 'Mármore branco com veios acinzentados e dourados, de alta resistência e beleza.',
     category: 'Mármore',
     rating: 4.7
   },
   {
     id: '9',
-    name: 'Mármore Chocolate',
-    image: require('../assets/images/marmore-chocolate.jpg'),
-    description: 'Mármore de tonalidade chocolate.',
+    name: 'Mármore Cintilante Green',
+    image: require('../assets/images/marmore-cintilante-green.jpg'),
+    description: 'Mármore verde com aspecto cintilante, ideal para áreas decorativas.',
     category: 'Mármore',
     rating: 4.6
   },
   {
     id: '10',
-    name: 'Mármore Imperial Pink',
-    image: require('../assets/images/marmore-imperial-pink.jpg'),
-    description: 'Mármore rosa imperial exclusivo.',
+    name: 'Mármore Arabescato Super White',
+    image: require('../assets/images/marmore-arabescato-super-white.jpg'),
+    description: 'Mármore branco com veios cinza escuro.',
     category: 'Mármore',
     rating: 4.8
   },
   {
     id: '11',
-    name: 'Mármore Pinta Verde',
-    image: require('../assets/images/marmore-pinta-verde.jpg'),
-    description: 'Mármore com detalhes em verde.',
+    name: 'Mármore Pegasus Blue',
+    image: require('../assets/images/marmore-pegasus-blue.jpg'),
+    description: 'Mármore azul acinzentado com veios claros.',
+    category: 'Mármore',
+    rating: 4.5
+  },
+  {
+    id: '12',
+    name: 'Mármore Shadow',
+    image: require('../assets/images/marmore-shadow.jpg'),
+    description: 'Lorem ipsum dolor sit amet.',
+    category: 'Mármore',
+    rating: 4.5
+  },
+  {
+    id: '13',
+    name: 'Mármore Ragnatela',
+    image: require('../assets/images/marmore-ragnatela.jpeg'),
+    description: 'Fundo branco com veios finos.',
     category: 'Mármore',
     rating: 4.5
   },

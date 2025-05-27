@@ -130,6 +130,7 @@ const rockDetails = {
     ],
     maintenance: 'Limpe com água e sabão neutro. Evite produtos ácidos ou abrasivos. Recomenda-se aplicar impermeabilizante a cada 12 meses.'
   },
+  // MÁRMORES 
   'Mármore Branco Clássico': {
     description: 'Mármore branco clássico, perfeito para ambientes internos elegantes.',
     characteristics: [
@@ -149,81 +150,119 @@ const rockDetails = {
     ],
     maintenance: 'Limpe com água e sabão neutro. Evite produtos ácidos e materiais abrasivos. Não recomendado para áreas externas ou box de banheiro.'
   },
-  'Mármore Cachoeiro White': {
-    description: 'Mármore branco de Cachoeiro, elegante e versátil para ambientes internos.',
+  'Mármore Dolomítico Matarazzo': {
+    description: 'Mármore dolomítico branco com veios acinzentados e dourados, de alta resistência e beleza clássica.',
     characteristics: [
       { name: 'Tipo', value: 'Mármore' },
       { name: 'Cor predominante', value: 'Branco' },
-      { name: 'Densidade Aparente', value: '2901 kg/m³' },
-      { name: 'Absorção d\'água', value: '0,01%' },
-      { name: 'Porosidade Aparente', value: '0,04%' },
-      { name: 'Flexão', value: '18,11 MPa' },
+      { name: 'Densidade Aparente', value: '2852 kg/m³' },
+      { name: 'Absorção d\'água', value: '0,18%' },
+      { name: 'Porosidade Aparente', value: '0,50%' },
+      { name: 'Flexão', value: '10 à 15 MPa' },
     ],
     applications: [
-      'Pisos de muito baixo tráfego',
-      'Paredes internas',
-      'Divisórias',
+      'Bancadas de alto padrão',
+      'Revestimento de paredes internas e fachadas',
+      'Mesas e tampos ',
       'Lavabos',
-      'Bancadas (com impermeabilização)',
+      'Detalhes decorativos como painéis retroiluminados',
     ],
-    maintenance: 'Limpe com água e sabão neutro. Evite produtos ácidos e materiais abrasivos. Não recomendado para áreas externas ou box de banheiro.'
+    maintenance: 'Limpe com sabão neutro e água; seque imediatamente para evitar manchas.'
   },
-  'Mármore Chocolate': {
-    description: 'Mármore de tonalidade chocolate, sofisticado para ambientes internos.',
+  'Mármore Cintilante Green': {
+    description: 'Mármore verde com aspecto cintilante, ideal para áreas decorativas com impacto visual.',
     characteristics: [
       { name: 'Tipo', value: 'Mármore' },
-      { name: 'Cor predominante', value: 'Marrom chocolate' },
-      { name: 'Densidade Aparente', value: '2733 kg/m³' },
-      { name: 'Absorção d\'água', value: '0,01%' },
-      { name: 'Porosidade Aparente', value: '0,02%' },
-      { name: 'Flexão', value: '17,54 MPa' },
+      { name: 'Cor predominante', value: 'Verde' },
+      { name: 'Densidade Aparente', value: '2792 kg/m³' },
+      { name: 'Absorção d\'água', value: '0,08%' },
+      { name: 'Porosidade Aparente', value: '0,21%' },
+      { name: 'Flexão', value: '8,10 MPa' },
     ],
     applications: [
-      'Pisos de muito baixo tráfego',
-      'Paredes internas',
-      'Divisórias',
-      'Lavabos',
-      'Bancadas (com impermeabilização)',
+      'Revestimento de paredes',
+      'Bancadas decorativas e aparadores',
+      'Tampos de móveis ',
+      'Pisos de ambientes refinados',
+      'Aplicações artísticas como mosaicos e painéis',
     ],
-    maintenance: 'Limpe com água e sabão neutro. Evite produtos ácidos e materiais abrasivos. Não recomendado para áreas externas ou box de banheiro.'
+    maintenance: 'Lave com sabão neutro diluído; evite esfregar com esponjas ásperas.'
   },
-  'Mármore Imperial Pink': {
-    description: 'Mármore rosa imperial, exclusivo para ambientes internos sofisticados.',
+  'Mármore Arabescato Super White': {
+    description: 'Mármore branco com veios cinza escuro, sofisticado e versátil para ambientes internos.',
     characteristics: [
       { name: 'Tipo', value: 'Mármore' },
-      { name: 'Cor predominante', value: 'Rosa' },
-      { name: 'Densidade Aparente', value: '2732 kg/m³' },
-      { name: 'Absorção d\'água', value: '0,06%' },
-      { name: 'Porosidade Aparente', value: '0,17%' },
-      { name: 'Flexão', value: '18,43 MPa' },
+      { name: 'Cor predominante', value: 'Branco' },
+      { name: 'Densidade Aparente', value: 'X kg/m³' },
+      { name: 'Absorção d\'água', value: 'X%' },
+      { name: 'Porosidade Aparente', value: 'X%' },
+      { name: 'Flexão', value: 'X MPa' },
     ],
     applications: [
-      'Pisos de muito baixo tráfego',
+      'Bancadas de cozinhas e banheiros',
       'Paredes internas',
-      'Divisórias',
-      'Lavabos',
-      'Bancadas (com impermeabilização)',
+      'Ilhas centrais decorativas',
+      'Lareiras e painéis',
+      'Pisos de áreas sociais',
     ],
-    maintenance: 'Limpe com água e sabão neutro. Evite produtos ácidos e materiais abrasivos. Não recomendado para áreas externas ou box de banheiro.'
+    maintenance: 'Use pano macio com detergente neutro; evite ácidos e abrasivos.'
   },
-  'Mármore Pinta Verde': {
-    description: 'Mármore com detalhes em verde, elegante para ambientes internos.',
+  'Mármore Pegasus Blue': {
+    description: 'Mármore azul acinzentado com veios claros, de aparência contemporânea e elegante.',
     characteristics: [
       { name: 'Tipo', value: 'Mármore' },
-      { name: 'Cor predominante', value: 'Branco com detalhes verdes' },
-      { name: 'Densidade Aparente', value: '2855 kg/m³' },
-      { name: 'Absorção d\'água', value: '0,06%' },
-      { name: 'Porosidade Aparente', value: '0,17%' },
-      { name: 'Flexão', value: '13,04 MPa' },
+      { name: 'Cor predominante', value: 'Azul' },
+      { name: 'Densidade Aparente', value: 'X kg/m³' },
+      { name: 'Absorção d\'água', value: 'X%' },
+      { name: 'Porosidade Aparente', value: 'X%' },
+      { name: 'Flexão', value: 'X MPa' },
     ],
     applications: [
-      'Pisos de muito baixo tráfego',
-      'Paredes internas',
-      'Divisórias',
-      'Lavabos',
-      'Bancadas (com impermeabilização)',
+      'Pisos de halls de entrada',
+      'Painéis de destaque em salas e quartos',
+      'Bancadas em lavabos',
+      'Revestimentos em escadas',
+      'Mesas de jantar ou centro',
     ],
-    maintenance: 'Limpe com água e sabão neutro. Evite produtos ácidos e materiais abrasivos. Não recomendado para áreas externas ou box de banheiro.'
+    maintenance: 'Utilize pano úmido com detergente neutro; não utilize produtos químicos agressivos.'
+  },
+    'Mármore Shadow': {
+    description: 'Lorem ipsum dolor sit amet.',
+    characteristics: [
+      { name: 'Tipo', value: 'Mármore' },
+      { name: 'Cor predominante', value: 'X' },
+      { name: 'Densidade Aparente', value: 'X kg/m³' },
+      { name: 'Absorção d\'água', value: 'X%' },
+      { name: 'Porosidade Aparente', value: 'X%' },
+      { name: 'Flexão', value: 'X MPa' },
+    ],
+    applications: [
+      'Lorem ipsum dolor sit amet.',
+      'Lorem ipsum dolor sit amet.',
+      'Lorem ipsum dolor sit amet.',
+      'Lorem ipsum dolor sit amet.',
+      'Lorem ipsum dolor sit amet.',
+    ],
+    maintenance: 'Lorem ipsum dolor sit amet.'
+  },
+    'Mármore Ragnatela': {
+    description: 'Fundo branco com veios finos em padrão que lembra teia, conferindo um visual delicado e refinado.',
+    characteristics: [
+      { name: 'Tipo', value: 'Mármore' },
+      { name: 'Cor predominante', value: 'X' },
+      { name: 'Densidade Aparente', value: 'X kg/m³' },
+      { name: 'Absorção d\'água', value: 'X%' },
+      { name: 'Porosidade Aparente', value: 'X%' },
+      { name: 'Flexão', value: 'X MPa' },
+    ],
+    applications: [
+      'Pisos de áreas internas e externas',
+      'Revestimento de paredes e fachadas',
+      'Bancadas de cozinhas e banheiros',
+      'Escadas internas',
+      'Detalhes arquitetônicos e decorativos',
+    ],
+    maintenance: 'Utilize pano macio com detergente neutro diluído em água. Evite produtos ácidos ou abrasivos para preservar o brilho e a integridade da superfície.'
   }
 };
 
