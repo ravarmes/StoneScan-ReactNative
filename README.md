@@ -54,10 +54,10 @@ Para cada rocha, o aplicativo fornece:
 
 ### Requisitos Técnicos
 
-- Node.js 14.x ou superior
-- Expo CLI
+- Node.js 20.x ou superior
+- EAS CLI
 - React Native
-- Expo Go App (para desenvolvimento)
+- Android Dev Client (APK)
 
 ### Como Executar
 
@@ -65,18 +65,21 @@ Para cada rocha, o aplicativo fornece:
 ```bash
 git clone https://github.com/ravarmes/StoneScan-ReactNative.git
 ```
-
-2. Instale as dependências:
+2. Instale o APK:
 ```bash
-npm install
+https://expo.dev/artifacts/eas/uF3PgkJNjakbG4SgRZBqxX.apk
+```
+3. Instale as dependências:
+```bash
+npm install --legacy-peer-deps
 ```
 
-3. Inicie o projeto:
+4. Inicie o projeto:
 ```bash
-npx expo start
+npx expo start --dev-client
 ```
 
-4. Use o Expo Go em seu dispositivo móvel para escanear o QR Code
+5. Use o APK em seu dispositivo móvel para escanear o QR Code
 
 ### Estrutura do Projeto
 
@@ -100,6 +103,7 @@ StoneScanApp/
 - AsyncStorage
 - React Native Safe Area Context
 - Expo Vector Icons
+- TensorFlow Lite
 
 ## Desenvolvimento
 

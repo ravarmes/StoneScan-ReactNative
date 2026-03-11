@@ -8,62 +8,140 @@ import {
   Alert,
   ActivityIndicator
 } from 'react-native';
-import { Camera } from 'expo-camera';
+import { CameraView, useCameraPermissions } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import Header from '../components/Header';
 import ScanButton from '../components/ScanButton';
+import { loadTensorflowModel } from 'react-native-fast-tflite';
+import * as ImageManipulator from 'expo-image-manipulator';
+import * as FileSystem from 'expo-file-system/legacy';
+import jpeg from 'jpeg-js';
+import { Buffer } from 'buffer';
 
 const ScanScreen = ({ navigation }) => {
-  const [hasPermission, setHasPermission] = useState(null);
-  const [cameraType, setCameraType] = useState(Camera.Constants.Type.back);
-  const [flashMode, setFlashMode] = useState(Camera.Constants.FlashMode.off);
+  const [permission, requestPermission] = useCameraPermissions();
+  const [cameraType, setCameraType] = useState('back');
+  const [flashMode, setFlashMode] = useState('off');
   const [isScanning, setIsScanning] = useState(false);
   const cameraRef = useRef(null);
-  
-  useEffect(() => {
-    (async () => {
-      const { status } = await Camera.requestCameraPermissionsAsync();
-      setHasPermission(status === 'granted');
-    })();
+  const [model, setModel] = useState(null);
+
+useEffect(() => {
+    async function loadModel() {
+      try {
+        const tfModel = await loadTensorflowModel(require('../../assets/best_model_float16.tflite'));
+        setModel(tfModel);
+        console.log("Modelo IA carregado");
+      } catch (e) {
+        console.error("Erro ao carregar modelo IA:", e);
+      }
+    }
+    loadModel();
   }, []);
 
   const handleCameraFlip = () => {
     setCameraType(
-      cameraType === Camera.Constants.Type.back
-        ? Camera.Constants.Type.front
-        : Camera.Constants.Type.back
+      cameraType === 'back'
+        ? 'front'
+        : 'back'
     );
   };
-
+  
   const handleFlashToggle = () => {
     setFlashMode(
-      flashMode === Camera.Constants.FlashMode.off
-        ? Camera.Constants.FlashMode.on
-        : Camera.Constants.FlashMode.off
+      flashMode === 'off'
+        ? 'on'
+        : 'off'
     );
   };
 
+  const processImageToTensor = async (uri) => {
+    //Redimensiona para 224x224
+    const manipResult = await ImageManipulator.manipulateAsync(
+      uri,
+      [{ resize: { width: 224, height: 224 } }],
+      { format: ImageManipulator.SaveFormat.JPEG }
+    );
+
+    const imgB64 = await FileSystem.readAsStringAsync(manipResult.uri, {
+  encoding: 'base64', 
+});
+
+    const imgBuffer = Buffer.from(imgB64, 'base64');
+    const rawImageData = jpeg.decode(imgBuffer, { useTArray: true });
+    const { width, height, data } = rawImageData;
+
+    const float32Data = new Float32Array(3 * width * height);
+
+    //Obrigatório para ResNet
+    const FLOAT_MAX = 255.0;
+    const mean = [0.485, 0.456, 0.406];
+    const std = [0.229, 0.224, 0.225];
+
+    for (let i = 0; i < width * height; i++) {
+      const r = data[i * 4] / FLOAT_MAX;
+      const g = data[i * 4 + 1] / FLOAT_MAX;
+      const b = data[i * 4 + 2] / FLOAT_MAX;
+
+      float32Data[i] = (r - mean[0]) / std[0];                                  
+      float32Data[width * height + i] = (g - mean[1]) / std[1];                 
+      float32Data[2 * width * height + i] = (b - mean[2]) / std[2];         
+    }
+    
+    return float32Data;
+  };
+  
+  const classifyRock = async (imageUri) => {
+    if (!model) {
+      Alert.alert("Aviso", "O motor de IA ainda está carregando.");
+      return "Modelo indisponível";
+    }
+
+    try {
+      console.log("Iniciando conversão da imagem...");
+      const inputTensor = await processImageToTensor(imageUri);
+      
+      console.log("Rodando IA...");
+      const output = await model.run([inputTensor]);
+      
+      const predictions = output[0]; 
+      
+      const maxIndex = predictions.indexOf(Math.max(...predictions));
+      
+      const ROCK_CLASSES = [
+        'Granito Branco Itaúnas', 
+        'Mármore Matarazzo', 
+        'Quartzito Perla', 
+        'Quartzito Wakanda', 
+        'Quartzito Verde Gaya'
+      ];
+      
+      const pedraDetectada = ROCK_CLASSES[maxIndex];
+      console.log("Resultado da IA:", pedraDetectada);
+      
+      return pedraDetectada;
+    } catch (error) {
+      console.error("Erro na inferência:", error);
+      return "Erro na análise";
+    }
+  };
+  
   const takePicture = async () => {
     if (cameraRef.current) {
       setIsScanning(true);
       try {
         const photo = await cameraRef.current.takePictureAsync();
-        // Simulate processing time
-        setTimeout(() => {
-          setIsScanning(false);
-          
-          // Resultados simulados do escaneamento
-          const rockName = 'Granito Preto São Gabriel';
-          
-          // Não salvamos mais no histórico aqui, apenas navegamos para a tela de resultado
-          navigation.navigate('Result', { 
-            image: photo.uri,
-            rockName: rockName,
-            fromScan: true
-          });
-        }, 2000);
+        
+        const rockName = await classifyRock(photo.uri);
+        
+        setIsScanning(false);
+        navigation.navigate('Result', { 
+          image: photo.uri,
+          rockName: rockName,
+          fromScan: true
+        });
       } catch (error) {
         setIsScanning(false);
         Alert.alert('Erro', 'Não foi possível capturar a foto.');
@@ -88,43 +166,45 @@ const ScanScreen = ({ navigation }) => {
 
     if (!result.canceled) {
       setIsScanning(true);
-      // Simulate processing time
-      setTimeout(() => {
-        setIsScanning(false);
-        
-        // Resultados simulados do escaneamento
-        const rockName = 'Mármore Branco Espírito Santo';
-        
-        // Não salvamos mais no histórico aqui, apenas navegamos para a tela de resultado
-        navigation.navigate('Result', { 
-          image: result.assets[0].uri,
-          rockName: rockName,
-          fromScan: true
-        });
-      }, 2000);
+      
+      const uri = result.assets[0].uri;
+      
+      // Chama a IA de verdade
+      const rockName = await classifyRock(uri);
+      
+      setIsScanning(false);
+      navigation.navigate('Result', { 
+        image: uri,
+        rockName: rockName,
+        fromScan: true
+      });
     }
   };
 
-  if (hasPermission === null) {
+  if (!permission) {
     return <View style={styles.container} />;
   }
   
-  if (hasPermission === false) {
+  if (!permission.granted) {
     return (
       <SafeAreaView style={styles.container}>
         <Header title="Escanear" />
         <View style={styles.permissionContainer}>
           <Ionicons name="camera-off-outline" size={64} color="#ccc" />
-          <Text style={styles.permissionText}>
-            Sem acesso à câmera
-          </Text>
+          <Text style={styles.permissionText}>Sem acesso à câmera</Text>
           <Text style={styles.permissionSubtext}>
-            Por favor, permita o acesso à câmera nas configurações do seu dispositivo para usar esta funcionalidade.
+            Por favor, permita o acesso à câmera para usar esta funcionalidade.
           </Text>
+          
           <TouchableOpacity 
-            style={styles.galleryButton}
-            onPress={pickImage}
+            style={[styles.galleryButton, { marginBottom: 12, backgroundColor: '#2E7D32' }]}
+            onPress={requestPermission}
           >
+            <Ionicons name="camera-outline" size={24} color="#fff" />
+            <Text style={styles.galleryButtonText}>Permitir Câmera</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.galleryButton} onPress={pickImage}>
             <Ionicons name="images-outline" size={24} color="#fff" />
             <Text style={styles.galleryButtonText}>Escolher da Galeria</Text>
           </TouchableOpacity>
@@ -138,7 +218,7 @@ const ScanScreen = ({ navigation }) => {
       <Header title="Escanear" />
       
       <View style={styles.cameraContainer}>
-        <Camera
+        <CameraView
           ref={cameraRef}
           style={styles.camera}
           type={cameraType}
@@ -151,7 +231,7 @@ const ScanScreen = ({ navigation }) => {
                 onPress={handleFlashToggle}
               >
                 <Ionicons 
-                  name={flashMode === Camera.Constants.FlashMode.on ? 'flash' : 'flash-off'} 
+                  name={flashMode === 'on' ? 'flash' : 'flash-off'} 
                   size={24} 
                   color="#fff" 
                 />
@@ -188,7 +268,7 @@ const ScanScreen = ({ navigation }) => {
               <View style={styles.placeholderButton} />
             </View>
           </View>
-        </Camera>
+        </CameraView>
       </View>
       
       <View style={styles.instructionsContainer}>
