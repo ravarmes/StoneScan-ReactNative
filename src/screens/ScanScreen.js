@@ -96,7 +96,7 @@ useEffect(() => {
   const classifyRock = async (imageUri) => {
     if (!model) {
       Alert.alert("Aviso", "O motor de IA ainda está carregando.");
-      return "Modelo indisponível";
+      return { rockName: "Modelo indisponível", confidence: 0 };
     }
 
     try {
@@ -106,9 +106,15 @@ useEffect(() => {
       console.log("Rodando IA...");
       const output = await model.run([inputTensor]);
       
-      const predictions = output[0]; 
+      const predictions = Array.from(output[0]); 
       
-      const maxIndex = predictions.indexOf(Math.max(...predictions));
+      const maxLogit = Math.max(...predictions);
+      const expScores = predictions.map(x => Math.exp(x - maxLogit));
+      const sumExp = expScores.reduce((a, b) => a + b, 0);
+      const probabilities = expScores.map(x => x / sumExp);
+      
+      const maxIndex = predictions.indexOf(maxLogit);
+      const confidence = Math.round(probabilities[maxIndex] * 100);
       
       const ROCK_CLASSES = [
         'Granito Branco Itaúnas', 
@@ -119,12 +125,12 @@ useEffect(() => {
       ];
       
       const pedraDetectada = ROCK_CLASSES[maxIndex];
-      console.log("Resultado da IA:", pedraDetectada);
+      console.log("Resultado da IA:", pedraDetectada, confidence);
       
-      return pedraDetectada;
+      return { rockName: pedraDetectada, confidence };
     } catch (error) {
       console.error("Erro na inferência:", error);
-      return "Erro na análise";
+      return { rockName: "Erro na análise", confidence: 0 };
     }
   };
   
@@ -134,12 +140,13 @@ useEffect(() => {
       try {
         const photo = await cameraRef.current.takePictureAsync();
         
-        const rockName = await classifyRock(photo.uri);
+        const result = await classifyRock(photo.uri);
         
         setIsScanning(false);
         navigation.navigate('Result', { 
           image: photo.uri,
-          rockName: rockName,
+          rockName: result.rockName,
+          confidence: result.confidence,
           fromScan: true
         });
       } catch (error) {
@@ -169,13 +176,13 @@ useEffect(() => {
       
       const uri = result.assets[0].uri;
       
-      // Chama a IA de verdade
-      const rockName = await classifyRock(uri);
+      const resultClassification = await classifyRock(uri);
       
       setIsScanning(false);
       navigation.navigate('Result', { 
         image: uri,
-        rockName: rockName,
+        rockName: resultClassification.rockName,
+        confidence: resultClassification.confidence,
         fromScan: true
       });
     }

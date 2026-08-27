@@ -249,7 +249,7 @@ const rockDetails = {
 const ResultScreen = ({ route, navigation }) => {
   console.log('ResultScreen params:', route.params);
   
-  const { image, rockName, fromScan, fromCatalog, fromHistory } = route.params;
+  const { image, rockName, confidence, fromScan, fromCatalog, fromHistory } = route.params;
   const { saveRating, getRating } = useUserRatings();
   const [userRating, setUserRating] = useState(0);
   const rockData = rockDetails[rockName] || {
@@ -258,6 +258,35 @@ const ResultScreen = ({ route, navigation }) => {
     applications: [],
     maintenance: 'Informações de manutenção não disponíveis.'
   };
+
+  const getConfidenceInfo = (conf) => {
+    if (conf === undefined || conf === null) return null;
+    if (conf >= 80) {
+      return {
+        color: '#2E7D32',
+        bgColor: '#E8F5E9',
+        label: 'Alta Confiança',
+        icon: 'checkmark-circle'
+      };
+    } else if (conf >= 60) {
+      return {
+        color: '#F57C00',
+        bgColor: '#FFF3E0',
+        label: 'Confiança Moderada',
+        icon: 'alert-circle'
+      };
+    } else {
+      return {
+        color: '#D32F2F',
+        bgColor: '#FFEBEE',
+        label: 'Baixa Confiança',
+        icon: 'warning',
+        warningText: 'A iluminação ou o ângulo podem ter interferido na identificação. Recomendamos escanear novamente com boa iluminação.'
+      };
+    }
+  };
+
+  const confInfo = getConfidenceInfo(confidence);
   
   // Carregar a avaliação salva quando a tela é montada
   useEffect(() => {
@@ -311,20 +340,19 @@ const ResultScreen = ({ route, navigation }) => {
     if (!saved) {
       console.log('Salvando no histórico. Image:', image);
       
-      // Garantir formato consistente para a imagem
       const imageData = typeof image === 'string' ? { uri: image } : image;
       
       console.log('Formato da imagem a ser salva:', imageData);
       
       const success = await addScanToHistory({
         name: rockName,
-        image: imageData
+        image: imageData,
+        confidence: confidence
       });
       
       if (success) {
         console.log('Salvo com sucesso no histórico');
         setSaved(true);
-        // Navegar para a tela Home e selecionar a aba de histórico
         navigation.navigate('Tabs', { screen: 'Home' });
       } else {
         console.error('Erro ao salvar no histórico');
@@ -401,6 +429,23 @@ const ResultScreen = ({ route, navigation }) => {
           </View>
           
           <Text style={styles.rockName}>{rockName}</Text>
+          
+          {confInfo && (
+            <View style={[styles.confidenceCard, { backgroundColor: confInfo.bgColor, borderColor: confInfo.color }]}>
+              <View style={styles.confidenceHeader}>
+                <Ionicons name={confInfo.icon} size={22} color={confInfo.color} />
+                <Text style={[styles.confidenceTitle, { color: confInfo.color }]}>
+                  {confidence}% de confiança ({confInfo.label})
+                </Text>
+              </View>
+              {confInfo.warningText && (
+                <Text style={styles.confidenceWarningText}>
+                  {confInfo.warningText}
+                </Text>
+              )}
+            </View>
+          )}
+
           <Text style={styles.rockDescription}>{rockData.description}</Text>
           
           <View style={styles.section}>
@@ -638,6 +683,28 @@ const styles = StyleSheet.create({
     color: '#666',
     fontSize: 14,
     marginTop: 8,
+  },
+  confidenceCard: {
+    borderRadius: 12,
+    borderWidth: 1,
+    padding: 12,
+    marginTop: 4,
+    marginBottom: 16,
+  },
+  confidenceHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  confidenceTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginLeft: 8,
+  },
+  confidenceWarningText: {
+    fontSize: 13,
+    color: '#555',
+    marginTop: 6,
+    lineHeight: 18,
   },
 });
 
