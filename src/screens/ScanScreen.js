@@ -42,19 +42,11 @@ useEffect(() => {
   }, []);
 
   const handleCameraFlip = () => {
-    setCameraType(
-      cameraType === 'back'
-        ? 'front'
-        : 'back'
-    );
+    setCameraType(prev => (prev === 'back' ? 'front' : 'back'));
   };
   
   const handleFlashToggle = () => {
-    setFlashMode(
-      flashMode === 'off'
-        ? 'on'
-        : 'off'
-    );
+    setFlashMode(prev => (prev === 'off' ? 'on' : 'off'));
   };
 
   const processImageToTensor = async (uri) => {
@@ -117,14 +109,17 @@ useEffect(() => {
       const confidence = Math.round(probabilities[maxIndex] * 100);
       
       const ROCK_CLASSES = [
-        'Granito Branco Itaúnas', 
-        'Mármore Matarazzo', 
-        'Quartzito Perla', 
-        'Quartzito Wakanda', 
+        'Granito Cinza Castelo',
+        'Granito Branco Itaúnas',
+        'Granito Preto Via Láctea',
+        'Mármore Arabescato Super White',
+        'Mármore Matarazzo',
+        'Quartzito Perla',
+        'Quartzito Wakanda',
         'Quartzito Verde Gaya'
       ];
       
-      const pedraDetectada = ROCK_CLASSES[maxIndex];
+      const pedraDetectada = ROCK_CLASSES[maxIndex] || "Rocha não identificada";
       console.log("Resultado da IA:", pedraDetectada, confidence);
       
       return { rockName: pedraDetectada, confidence };
@@ -135,28 +130,32 @@ useEffect(() => {
   };
   
   const takePicture = async () => {
-    if (cameraRef.current) {
-      setIsScanning(true);
-      try {
-        const photo = await cameraRef.current.takePictureAsync();
-        
-        const result = await classifyRock(photo.uri);
-        
-        setIsScanning(false);
-        navigation.navigate('Result', { 
-          image: photo.uri,
-          rockName: result.rockName,
-          confidence: result.confidence,
-          fromScan: true
-        });
-      } catch (error) {
-        setIsScanning(false);
-        Alert.alert('Erro', 'Não foi possível capturar a foto.');
-      }
+    if (isScanning || !cameraRef.current) return;
+    setIsScanning(true);
+    try {
+      const photo = await cameraRef.current.takePictureAsync();
+      
+      const result = await classifyRock(photo.uri);
+      
+      setIsScanning(false);
+      navigation.navigate('Result', { 
+        image: photo.uri,
+        rockName: result.rockName,
+        confidence: result.confidence,
+        source: 'camera',
+        fromScan: true,
+        fromCatalog: false,
+        fromHistory: false,
+        feedbackChoice: null
+      });
+    } catch (error) {
+      setIsScanning(false);
+      Alert.alert('Erro', 'Não foi possível capturar a foto.');
     }
   };
 
   const pickImage = async () => {
+    if (isScanning) return;
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     
     if (status !== 'granted') {
@@ -183,7 +182,11 @@ useEffect(() => {
         image: uri,
         rockName: resultClassification.rockName,
         confidence: resultClassification.confidence,
-        fromScan: true
+        source: 'gallery',
+        fromScan: true,
+        fromCatalog: false,
+        fromHistory: false,
+        feedbackChoice: null
       });
     }
   };
@@ -228,8 +231,9 @@ useEffect(() => {
         <CameraView
           ref={cameraRef}
           style={styles.camera}
-          type={cameraType}
-          flashMode={flashMode}
+          facing={cameraType}
+          flash={flashMode}
+          enableTorch={flashMode === 'on'}
         >
           <View style={styles.overlayContainer}>
             <View style={styles.topControls}>
@@ -240,7 +244,7 @@ useEffect(() => {
                 <Ionicons 
                   name={flashMode === 'on' ? 'flash' : 'flash-off'} 
                   size={24} 
-                  color="#fff" 
+                  color={flashMode === 'on' ? '#FFD700' : '#fff'} 
                 />
               </TouchableOpacity>
               
@@ -252,6 +256,15 @@ useEffect(() => {
               </TouchableOpacity>
             </View>
             
+            {flashMode === 'on' && (
+              <View style={styles.flashWarningBadge}>
+                <Ionicons name="warning-outline" size={16} color="#FFD700" />
+                <Text style={styles.flashWarningText}>
+                  Atenção: evite reflexos diretos e excesso de luz na rocha.
+                </Text>
+              </View>
+            )}
+
             <View style={styles.scanFrame}>
               {isScanning && (
                 <View style={styles.scanningOverlay}>
@@ -329,6 +342,26 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.3)',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  flashWarningBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.75)',
+    marginHorizontal: 20,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#FFD700',
+    alignSelf: 'center',
+    marginTop: -8,
+    marginBottom: 8,
+  },
+  flashWarningText: {
+    color: '#fff',
+    fontSize: 12,
+    marginLeft: 6,
+    flexShrink: 1,
   },
   scanFrame: {
     alignSelf: 'center',

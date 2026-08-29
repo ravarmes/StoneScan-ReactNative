@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "288511796526",
+    "project_id": "stonescan-fe353",
+    "storage_bucket": "stonescan-fe353.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:288511796526:android:19ac07ab3590449cc9c6bf",
+        "android_client_info": {
+          "package_name": "com.fapes.stonescan"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSy_REPLACED_SECRET_KEY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

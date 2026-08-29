@@ -12,9 +12,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import Header from '../components/Header';
 import { useScanHistory } from '../services/ScanHistoryContext';
-import { useUserRatings } from '../services/UserRatingsContext';
+import { sendFeedback } from '../services/firebase';
 
-// Mock rock data
 const rockDetails = {
   'Granito Amarelo Capri': {
     description: 'Granito de cor amarela com padrão uniforme, ideal para ambientes internos.',
@@ -247,17 +246,26 @@ const rockDetails = {
 };
 
 const ResultScreen = ({ route, navigation }) => {
-  console.log('ResultScreen params:', route.params);
-  
-  const { image, rockName, confidence, fromScan, fromCatalog, fromHistory } = route.params;
-  const { saveRating, getRating } = useUserRatings();
-  const [userRating, setUserRating] = useState(0);
+  const { image, rockName, confidence, source, feedbackChoice: initialFeedback, fromScan, fromCatalog, fromHistory } = route.params;
+  const [feedbackChoice, setFeedbackChoice] = useState(initialFeedback || null);
+  const [saved, setSaved] = useState(false);
+  const prevParamsKey = React.useRef(null);
+
   const rockData = rockDetails[rockName] || {
     description: 'Informações detalhadas não disponíveis para esta rocha.',
     characteristics: [],
     applications: [],
     maintenance: 'Informações de manutenção não disponíveis.'
   };
+
+  useEffect(() => {
+    const key = `${image}-${rockName}`;
+    if (prevParamsKey.current !== key) {
+      prevParamsKey.current = key;
+      setFeedbackChoice(initialFeedback || null);
+      setSaved(false);
+    }
+  }, [image, rockName, initialFeedback]);
 
   const getConfidenceInfo = (conf) => {
     if (conf === undefined || conf === null) return null;
@@ -287,21 +295,21 @@ const ResultScreen = ({ route, navigation }) => {
   };
 
   const confInfo = getConfidenceInfo(confidence);
-  
-  // Carregar a avaliação salva quando a tela é montada
-  useEffect(() => {
-    const savedRating = getRating(rockName);
-    setUserRating(savedRating);
-  }, [rockName]);
 
-  // Função para lidar com a mudança de avaliação
-  const handleRatingChange = async (rating) => {
-    setUserRating(rating);
-    const success = await saveRating(rockName, rating);
-    if (!success) {
-      console.error('Erro ao salvar a avaliação');
-      // Você pode adicionar um feedback visual para o usuário aqui
+  const handleFeedbackChoice = async (choice) => {
+    console.log('[DEBUG] Toque no botao:', choice, { feedbackChoice, fromHistory });
+    if (feedbackChoice || fromHistory) {
+      console.log('[DEBUG] Acao ignorada (ja avaliado ou historico)');
+      return;
     }
+    setFeedbackChoice(choice);
+    const result = await sendFeedback({
+      rockName,
+      feedback: choice,
+      confidence,
+      source: source || 'camera'
+    });
+    console.log('[DEBUG] Resultado do envio:', result);
   };
 
   // Determinar a fonte da imagem
@@ -334,7 +342,6 @@ const ResultScreen = ({ route, navigation }) => {
   
   // Acessar o contexto de histórico
   const { addScanToHistory } = useScanHistory();
-  const [saved, setSaved] = useState(false);
   
   const handleSaveToHistory = async () => {
     if (!saved) {
@@ -347,7 +354,9 @@ const ResultScreen = ({ route, navigation }) => {
       const success = await addScanToHistory({
         name: rockName,
         image: imageData,
-        confidence: confidence
+        confidence: confidence,
+        feedbackChoice: feedbackChoice,
+        source: source || 'camera'
       });
       
       if (success) {
@@ -381,27 +390,6 @@ const ResultScreen = ({ route, navigation }) => {
     } catch (error) {
       console.log(error.message);
     }
-  };
-
-  // Função para renderizar estrelas interativas
-  const renderInteractiveStars = () => {
-    return (
-      <View style={styles.userRatingContainer}>
-        {[1, 2, 3, 4, 5].map((star) => (
-          <TouchableOpacity
-            key={star}
-            onPress={() => handleRatingChange(star)}
-            style={styles.starButton}
-          >
-            <Ionicons
-              name={star <= userRating ? "star" : "star-outline"}
-              size={32}
-              color="#FFD700"
-            />
-          </TouchableOpacity>
-        ))}
-      </View>
-    );
   };
 
   return (
@@ -448,15 +436,79 @@ const ResultScreen = ({ route, navigation }) => {
 
           <Text style={styles.rockDescription}>{rockData.description}</Text>
           
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Sua Avaliação</Text>
-            {renderInteractiveStars()}
-            <Text style={styles.ratingHint}>
-              {userRating > 0 
-                ? `Você avaliou esta rocha com ${userRating} estrela${userRating > 1 ? 's' : ''}`
-                : 'Toque nas estrelas para avaliar esta rocha'}
-            </Text>
-          </View>
+          {!fromCatalog && (
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>A identificação está correta?</Text>
+              <View style={styles.feedbackButtonsRow}>
+                <TouchableOpacity 
+                  disabled={Boolean(fromHistory || feedbackChoice)}
+                  style={[
+                    styles.feedbackOptionButton, 
+                    feedbackChoice === 'sim' && styles.feedbackButtonSimActive,
+                    Boolean(fromHistory || feedbackChoice) && feedbackChoice !== 'sim' && styles.feedbackButtonDisabled
+                  ]}
+                  onPress={() => handleFeedbackChoice('sim')}
+                >
+                  <Ionicons 
+                    name={feedbackChoice === 'sim' ? "thumbs-up" : "thumbs-up-outline"} 
+                    size={20} 
+                    color={feedbackChoice === 'sim' ? "#fff" : "#2E7D32"} 
+                  />
+                  <Text style={[
+                    styles.feedbackButtonText, 
+                    feedbackChoice === 'sim' && styles.feedbackButtonTextActive
+                  ]}>Sim</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity 
+                  disabled={Boolean(fromHistory || feedbackChoice)}
+                  style={[
+                    styles.feedbackOptionButton, 
+                    feedbackChoice === 'nao' && styles.feedbackButtonNaoActive,
+                    Boolean(fromHistory || feedbackChoice) && feedbackChoice !== 'nao' && styles.feedbackButtonDisabled
+                  ]}
+                  onPress={() => handleFeedbackChoice('nao')}
+                >
+                  <Ionicons 
+                    name={feedbackChoice === 'nao' ? "thumbs-down" : "thumbs-down-outline"} 
+                    size={20} 
+                    color={feedbackChoice === 'nao' ? "#fff" : "#D32F2F"} 
+                  />
+                  <Text style={[
+                    styles.feedbackButtonText, 
+                    feedbackChoice === 'nao' && styles.feedbackButtonTextActive
+                  ]}>Não</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity 
+                  disabled={Boolean(fromHistory || feedbackChoice)}
+                  style={[
+                    styles.feedbackOptionButton, 
+                    feedbackChoice === 'nao_sei' && styles.feedbackButtonNaoSeiActive,
+                    Boolean(fromHistory || feedbackChoice) && feedbackChoice !== 'nao_sei' && styles.feedbackButtonDisabled
+                  ]}
+                  onPress={() => handleFeedbackChoice('nao_sei')}
+                >
+                  <Ionicons 
+                    name={feedbackChoice === 'nao_sei' ? "help-circle" : "help-circle-outline"} 
+                    size={20} 
+                    color={feedbackChoice === 'nao_sei' ? "#fff" : "#666"} 
+                  />
+                  <Text style={[
+                    styles.feedbackButtonText, 
+                    feedbackChoice === 'nao_sei' && styles.feedbackButtonTextActive
+                  ]}>Não conheço</Text>
+                </TouchableOpacity>
+              </View>
+              {(fromHistory || feedbackChoice) && (
+                <Text style={styles.feedbackThanksText}>
+                  {fromHistory 
+                    ? (feedbackChoice ? 'Avaliação registrada anteriormente' : 'Sem avaliação registrada')
+                    : 'Obrigado pelo seu feedback!'}
+                </Text>
+              )}
+            </View>
+          )}
           
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Características</Text>
@@ -669,20 +721,53 @@ const styles = StyleSheet.create({
   savedButton: {
     backgroundColor: '#4CAF50',
   },
-  userRatingContainer: {
+  feedbackButtonsRow: {
     flexDirection: 'row',
-    justifyContent: 'center',
+    justifyContent: 'space-between',
+    gap: 8,
+  },
+  feedbackOptionButton: {
+    flex: 1,
+    flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 16,
+    justifyContent: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 4,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
+    backgroundColor: '#fafafa',
   },
-  starButton: {
-    padding: 8,
+  feedbackButtonDisabled: {
+    opacity: 0.4,
   },
-  ratingHint: {
+  feedbackButtonSimActive: {
+    backgroundColor: '#2E7D32',
+    borderColor: '#2E7D32',
+  },
+  feedbackButtonNaoActive: {
+    backgroundColor: '#D32F2F',
+    borderColor: '#D32F2F',
+  },
+  feedbackButtonNaoSeiActive: {
+    backgroundColor: '#555',
+    borderColor: '#555',
+  },
+  feedbackButtonText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#333',
+    marginLeft: 6,
+  },
+  feedbackButtonTextActive: {
+    color: '#fff',
+  },
+  feedbackThanksText: {
     textAlign: 'center',
-    color: '#666',
+    color: '#2E7D32',
     fontSize: 14,
-    marginTop: 8,
+    fontWeight: '600',
+    marginTop: 12,
   },
   confidenceCard: {
     borderRadius: 12,

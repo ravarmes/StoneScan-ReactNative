@@ -151,20 +151,28 @@ const HomeScreen = ({ navigation }) => {
     navigation.navigate('Scan');
   };
 
-  // Função para navegar para detalhes da rocha
   const handleRockPress = (rock) => {
     navigation.navigate('Result', {
       rockName: rock.name,
       image: rock.image,
-      fromCatalog: true
+      confidence: null,
+      source: null,
+      feedbackChoice: null,
+      fromScan: false,
+      fromCatalog: true,
+      fromHistory: false
     });
   };
   
-  // Função para visualizar detalhes de um escaneamento salvo
   const handleHistoryItemPress = (item) => {
     navigation.navigate('Result', {
       rockName: item.name,
       image: item.image,
+      confidence: item.confidence,
+      feedbackChoice: item.feedbackChoice,
+      source: item.source,
+      fromScan: false,
+      fromCatalog: false,
       fromHistory: true
     });
   };
@@ -249,7 +257,14 @@ const HomeScreen = ({ navigation }) => {
           <Image source={imageSource} style={styles.historyImage} />
           <View style={styles.historyInfo}>
             <Text style={styles.historyName}>{item.name}</Text>
-            <Text style={styles.historyDate}>{item.date}</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <Text style={styles.historyDate}>{item.date}</Text>
+              {item.confidence !== undefined && item.confidence !== null && (
+                <Text style={{ fontSize: 13, color: '#2E7D32', fontWeight: '600', marginLeft: 8 }}>
+                  • {item.confidence}%
+                </Text>
+              )}
+            </View>
           </View>
           <Ionicons name="chevron-forward" size={24} color="#666" />
         </TouchableOpacity>
@@ -265,7 +280,6 @@ const HomeScreen = ({ navigation }) => {
     );
   };
 
-  // Renderização condicional para o histórico
   const renderHistory = () => {
     if (isLoading) {
       return (
@@ -295,8 +309,9 @@ const HomeScreen = ({ navigation }) => {
       <FlatList
         data={scanHistory}
         renderItem={renderHistoryItem}
-        keyExtractor={item => item.id || `temp-${Math.random()}`}
+        keyExtractor={(item, index) => item.id ? String(item.id) : `history-${index}`}
         contentContainerStyle={styles.historyList}
+        showsVerticalScrollIndicator={false}
       />
     );
   };
@@ -431,7 +446,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   historyList: {
-    paddingBottom: 16,
+    paddingBottom: 100,
   },
   historyItem: {
     flexDirection: 'row',
@@ -444,6 +459,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 2,
+    overflow: 'hidden',
   },
   historyContent: {
     flexDirection: 'row',
@@ -471,14 +487,11 @@ const styles = StyleSheet.create({
     color: '#666',
   },
   deleteButton: {
-    padding: 12,
+    width: 50,
+    alignSelf: 'stretch',
     backgroundColor: '#ffebee',
-    borderTopRightRadius: 12,
-    borderBottomRightRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
-    height: '100%',
-    width: 50,
   },
   emptyState: {
     flex: 1,
