@@ -189,40 +189,21 @@ const HomeScreen = ({ navigation }) => {
     />
   );
 
-  const handleDeleteScan = async (itemId, itemName) => {
+  const handleDeleteScan = async (itemId) => {
     if (!itemId) {
       console.error('ID inválido para exclusão:', itemId);
       return;
     }
-    
-    console.log('Tentando excluir item:', { id: itemId, name: itemName });
-    
-    // Executar a remoção diretamente
     const success = await removeScanFromHistory(itemId);
-    console.log('Resultado da remoção:', success);
-    
-    if (success) {
-      console.log('Item removido com sucesso:', itemId);
-    } else {
-      console.error('Falha ao remover item:', itemId);
+    if (!success) {
+      console.error('Falha ao remover item do histórico:', itemId);
     }
   };
 
   const handleClearHistory = async () => {
-    if (!scanHistory || scanHistory.length === 0) {
-      console.log('Histórico já está vazio');
-      return;
-    }
-
-    console.log('Tentando limpar histórico. Items atuais:', scanHistory.length);
-    
-    // Executar a limpeza diretamente
+    if (!scanHistory || scanHistory.length === 0) return;
     const success = await clearHistory();
-    console.log('Resultado da limpeza:', success);
-    
-    if (success) {
-      console.log('Histórico limpo com sucesso');
-    } else {
+    if (!success) {
       console.error('Falha ao limpar histórico');
     }
   };
@@ -240,11 +221,9 @@ const HomeScreen = ({ navigation }) => {
           imageSource = item.image;
         }
       } else {
-        // Imagem padrão
         imageSource = require('../assets/images/granito-preto-sao-gabriel.jpg');
       }
-    } catch (error) {
-      console.error('Erro ao processar imagem:', error);
+    } catch {
       imageSource = require('../assets/images/granito-preto-sao-gabriel.jpg');
     }
 

@@ -246,7 +246,7 @@ const rockDetails = {
 };
 
 const ResultScreen = ({ route, navigation }) => {
-  const { image, rockName, confidence, source, feedbackChoice: initialFeedback, fromScan, fromCatalog, fromHistory } = route.params;
+  const { image, rockName, confidence, source, feedbackChoice: initialFeedback, fromScan, fromCatalog, fromHistory, outOfDomain } = route.params;
   const [feedbackChoice, setFeedbackChoice] = useState(initialFeedback || null);
   const [saved, setSaved] = useState(false);
   const prevParamsKey = React.useRef(null);
@@ -297,26 +297,18 @@ const ResultScreen = ({ route, navigation }) => {
   const confInfo = getConfidenceInfo(confidence);
 
   const handleFeedbackChoice = async (choice) => {
-    console.log('[DEBUG] Toque no botao:', choice, { feedbackChoice, fromHistory });
-    if (feedbackChoice || fromHistory) {
-      console.log('[DEBUG] Acao ignorada (ja avaliado ou historico)');
-      return;
-    }
+    if (feedbackChoice || fromHistory) return;
     setFeedbackChoice(choice);
-    const result = await sendFeedback({
+    await sendFeedback({
       rockName,
       feedback: choice,
       confidence,
       source: source || 'camera'
     });
-    console.log('[DEBUG] Resultado do envio:', result);
   };
 
   // Determinar a fonte da imagem
   const getImageSource = () => {
-    console.log('Tipo da imagem recebida:', typeof image);
-    console.log('Imagem recebida:', image);
-
     try {
       if (fromCatalog) {
         return image; // Imagem do catálogo já está no formato correto
@@ -334,8 +326,7 @@ const ResultScreen = ({ route, navigation }) => {
       
       // Caso nenhuma das condições acima seja atendida, usar imagem padrão
       return require('../assets/images/granito-preto-sao-gabriel.jpg');
-    } catch (error) {
-      console.error('Erro ao processar imagem:', error);
+    } catch {
       return require('../assets/images/granito-preto-sao-gabriel.jpg');
     }
   };
@@ -345,11 +336,7 @@ const ResultScreen = ({ route, navigation }) => {
   
   const handleSaveToHistory = async () => {
     if (!saved) {
-      console.log('Salvando no histórico. Image:', image);
-      
       const imageData = typeof image === 'string' ? { uri: image } : image;
-      
-      console.log('Formato da imagem a ser salva:', imageData);
       
       const success = await addScanToHistory({
         name: rockName,
@@ -360,7 +347,6 @@ const ResultScreen = ({ route, navigation }) => {
       });
       
       if (success) {
-        console.log('Salvo com sucesso no histórico');
         setSaved(true);
         navigation.navigate('Tabs', { screen: 'Home' });
       } else {
@@ -388,7 +374,7 @@ const ResultScreen = ({ route, navigation }) => {
         title: 'Rocha identificada com StoneScan',
       });
     } catch (error) {
-      console.log(error.message);
+      console.error('Erro ao compartilhar:', error.message);
     }
   };
 
@@ -408,17 +394,40 @@ const ResultScreen = ({ route, navigation }) => {
               style={styles.rockImage} 
               resizeMode="cover"
             />
-            {!fromCatalog && !fromHistory && (
+            {!fromCatalog && !fromHistory && !outOfDomain && (
               <View style={styles.successBadge}>
                 <Ionicons name="checkmark-circle" size={24} color="#fff" />
                 <Text style={styles.successText}>Identificado com sucesso</Text>
+              </View>
+            )}
+            {outOfDomain && (
+              <View style={[styles.successBadge, { backgroundColor: 'rgba(211, 47, 47, 0.85)' }]}>
+                <Ionicons name="alert-circle" size={24} color="#fff" />
+                <Text style={styles.successText}>Não é uma rocha conhecida</Text>
               </View>
             )}
           </View>
           
           <Text style={styles.rockName}>{rockName}</Text>
           
-          {confInfo && (
+          {outOfDomain && (
+            <View style={[styles.section, { backgroundColor: '#FFEBEE', borderColor: '#D32F2F', borderWidth: 1 }]}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 12 }}>
+                <Ionicons name="warning-outline" size={28} color="#D32F2F" />
+                <Text style={[styles.sectionTitle, { color: '#D32F2F', marginBottom: 0, marginLeft: 8 }]}>
+                  Imagem fora do domínio
+                </Text>
+              </View>
+              <Text style={{ fontSize: 15, color: '#555', lineHeight: 22 }}>
+                A imagem enviada não foi reconhecida como uma rocha ornamental presente em nosso banco de dados.
+              </Text>
+              <Text style={{ fontSize: 15, color: '#555', lineHeight: 22, marginTop: 8 }}>
+                Certifique-se de fotografar a superfície de uma rocha ornamental com boa iluminação e tente novamente.
+              </Text>
+            </View>
+          )}
+
+          {!outOfDomain && confInfo && (
             <View style={[styles.confidenceCard, { backgroundColor: confInfo.bgColor, borderColor: confInfo.color }]}>
               <View style={styles.confidenceHeader}>
                 <Ionicons name={confInfo.icon} size={22} color={confInfo.color} />
@@ -434,9 +443,11 @@ const ResultScreen = ({ route, navigation }) => {
             </View>
           )}
 
-          <Text style={styles.rockDescription}>{rockData.description}</Text>
+          {!outOfDomain && (
+            <Text style={styles.rockDescription}>{rockData.description}</Text>
+          )}
           
-          {!fromCatalog && (
+          {!fromCatalog && !outOfDomain && (
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>A identificação está correta?</Text>
               <View style={styles.feedbackButtonsRow}>
@@ -510,72 +521,88 @@ const ResultScreen = ({ route, navigation }) => {
             </View>
           )}
           
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Características</Text>
-            {rockData.characteristics.map((item, index) => (
-              <View key={index} style={styles.characteristicItem}>
-                <Text style={styles.characteristicName}>{item.name}</Text>
-                <Text style={styles.characteristicValue}>{item.value}</Text>
+          {!outOfDomain && (
+            <>
+              <View style={styles.section}>
+                <Text style={styles.sectionTitle}>Características</Text>
+                {rockData.characteristics.map((item, index) => (
+                  <View key={index} style={styles.characteristicItem}>
+                    <Text style={styles.characteristicName}>{item.name}</Text>
+                    <Text style={styles.characteristicValue}>{item.value}</Text>
+                  </View>
+                ))}
               </View>
-            ))}
-          </View>
-          
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Aplicações Recomendadas</Text>
-            {rockData.applications.map((item, index) => (
-              <View key={index} style={styles.applicationItem}>
-                <Ionicons name="checkmark-circle" size={20} color="#2E7D32" />
-                <Text style={styles.applicationText}>{item}</Text>
+              
+              <View style={styles.section}>
+                <Text style={styles.sectionTitle}>Aplicações Recomendadas</Text>
+                {rockData.applications.map((item, index) => (
+                  <View key={index} style={styles.applicationItem}>
+                    <Ionicons name="checkmark-circle" size={20} color="#2E7D32" />
+                    <Text style={styles.applicationText}>{item}</Text>
+                  </View>
+                ))}
               </View>
-            ))}
-          </View>
-          
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Manutenção</Text>
-            <Text style={styles.maintenanceText}>{rockData.maintenance}</Text>
-          </View>
-          
-          <View style={styles.actionsContainer}>
-            {!fromCatalog && !fromHistory && (
+              
+              <View style={styles.section}>
+                <Text style={styles.sectionTitle}>Manutenção</Text>
+                <Text style={styles.maintenanceText}>{rockData.maintenance}</Text>
+              </View>
+              
+              <View style={styles.actionsContainer}>
+                {!fromCatalog && !fromHistory && (
+                  <TouchableOpacity 
+                    style={[
+                      styles.actionButton,
+                      styles.primaryButton,
+                      saved && styles.savedButton,
+                      { marginRight: 8 }
+                    ]}
+                    onPress={handleSaveToHistory}
+                    disabled={saved}
+                  >
+                    <Ionicons 
+                      name={saved ? "checkmark-circle" : "bookmark-outline"} 
+                      size={24} 
+                      color="white" 
+                    />
+                    <Text style={styles.primaryButtonText}>
+                      {saved ? "Salvo no histórico" : "Salvar no histórico"}
+                    </Text>
+                  </TouchableOpacity>
+                )}
+                
+                <TouchableOpacity 
+                  style={[
+                    styles.actionButton,
+                    fromCatalog ? styles.primaryButton : styles.secondaryButton,
+                    { flex: fromCatalog ? 1 : undefined }
+                  ]}
+                  onPress={handleShare}
+                >
+                  <Ionicons 
+                    name="share-social-outline" 
+                    size={20} 
+                    color={fromCatalog ? "white" : "#2E7D32"} 
+                  />
+                  <Text style={fromCatalog ? styles.primaryButtonText : styles.secondaryButtonText}>
+                    Compartilhar
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </>
+          )}
+
+          {outOfDomain && (
+            <View style={styles.actionsContainer}>
               <TouchableOpacity 
-                style={[
-                  styles.actionButton,
-                  styles.primaryButton,
-                  saved && styles.savedButton,
-                  { marginRight: 8 }
-                ]}
-                onPress={handleSaveToHistory}
-                disabled={saved}
+                style={[styles.actionButton, styles.primaryButton, { flex: 1 }]}
+                onPress={() => navigation.navigate('Tabs', { screen: 'Scan' })}
               >
-                <Ionicons 
-                  name={saved ? "checkmark-circle" : "bookmark-outline"} 
-                  size={24} 
-                  color="white" 
-                />
-                <Text style={styles.primaryButtonText}>
-                  {saved ? "Salvo no histórico" : "Salvar no histórico"}
-                </Text>
+                <Ionicons name="camera-outline" size={24} color="white" />
+                <Text style={styles.primaryButtonText}>Escanear novamente</Text>
               </TouchableOpacity>
-            )}
-            
-            <TouchableOpacity 
-              style={[
-                styles.actionButton,
-                fromCatalog ? styles.primaryButton : styles.secondaryButton,
-                { flex: fromCatalog ? 1 : undefined }
-              ]}
-              onPress={handleShare}
-            >
-              <Ionicons 
-                name="share-social-outline" 
-                size={20} 
-                color={fromCatalog ? "white" : "#2E7D32"} 
-              />
-              <Text style={fromCatalog ? styles.primaryButtonText : styles.secondaryButtonText}>
-                Compartilhar
-              </Text>
-            </TouchableOpacity>
-          </View>
+            </View>
+          )}
         </View>
       </ScrollView>
     </SafeAreaView>

@@ -16,8 +16,6 @@ const sendPayloadToFirestore = async (payload) => {
     }
   });
 
-  console.log('[FB] Enviando:', payload.rockName, payload.feedback);
-
   try {
     const response = await Promise.race([
       fetch(FIRESTORE_URL, {
@@ -30,11 +28,10 @@ const sendPayloadToFirestore = async (payload) => {
       )
     ]);
 
-    const text = await response.text();
-    console.log('[FB] Status:', response.status, 'Body:', text.substring(0, 150));
+    await response.text();
     return response.ok;
   } catch (err) {
-    console.log('[FB] Erro:', err.name, err.message);
+    console.error('[FB] Fetch falhou, tentando XHR:', err.message);
 
     return new Promise((resolve) => {
       const xhr = new XMLHttpRequest();
@@ -42,22 +39,17 @@ const sendPayloadToFirestore = async (payload) => {
       xhr.setRequestHeader('Content-Type', 'application/json');
       xhr.timeout = 15000;
 
-      xhr.onreadystatechange = () => {
-        console.log('[FB-XHR] readyState:', xhr.readyState, 'status:', xhr.status);
-      };
-
       xhr.onload = () => {
-        console.log('[FB-XHR] OK status:', xhr.status);
         resolve(xhr.status >= 200 && xhr.status < 300);
       };
 
       xhr.onerror = () => {
-        console.log('[FB-XHR] onerror readyState:', xhr.readyState, 'status:', xhr.status);
+        console.error('[FB] XHR erro ao enviar feedback');
         resolve(false);
       };
 
       xhr.ontimeout = () => {
-        console.log('[FB-XHR] timeout');
+        console.error('[FB] XHR timeout ao enviar feedback');
         resolve(false);
       };
 
@@ -67,9 +59,8 @@ const sendPayloadToFirestore = async (payload) => {
 };
 
 export const warmupFirestore = async () => {
-  console.log('[FB] Testando conectividade...');
   try {
-    const testResp = await Promise.race([
+    await Promise.race([
       fetch('https://firestore.googleapis.com/v1/projects/stonescan-fe353/databases/(default)/documents/feedbacks?pageSize=1&key=' + FIREBASE_API_KEY, {
         method: 'GET',
         headers: { 'Accept': 'application/json' }
@@ -78,9 +69,8 @@ export const warmupFirestore = async () => {
         setTimeout(() => reject(new Error('WARMUP_TIMEOUT_10S')), 10000)
       )
     ]);
-    console.log('[FB] Warmup status:', testResp.status);
-  } catch (err) {
-    console.log('[FB] Warmup erro:', err.message);
+  } catch {
+    // Warmup silencioso — sem conexão no momento, sync será feito depois
   }
 };
 
@@ -92,7 +82,6 @@ export const syncPendingFeedbacks = async () => {
     const queue = JSON.parse(rawQueue);
     if (!Array.isArray(queue) || queue.length === 0) return;
 
-    console.log('[FB] Sincronizando', queue.length, 'pendente(s)...');
     const remaining = [];
     for (const item of queue) {
       const ok = await sendPayloadToFirestore(item);
@@ -105,7 +94,7 @@ export const syncPendingFeedbacks = async () => {
       await AsyncStorage.removeItem(FEEDBACK_QUEUE_KEY);
     }
   } catch (error) {
-    console.log('[FB] Erro ao sincronizar fila:', error.message);
+    console.error('[FB] Erro ao sincronizar fila pendente:', error.message);
   }
 };
 
@@ -125,7 +114,7 @@ export const sendFeedback = async ({ rockName, feedback, confidence, source }) =
     queue.push(item);
     await AsyncStorage.setItem(FEEDBACK_QUEUE_KEY, JSON.stringify(queue));
   } catch (storageError) {
-    console.log('[FB] Erro salvar fila:', storageError.message);
+    console.error('[FB] Erro ao salvar na fila local:', storageError.message);
   }
 
   const ok = await sendPayloadToFirestore(item);

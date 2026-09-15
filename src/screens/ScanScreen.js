@@ -15,6 +15,7 @@ import { Ionicons } from '@expo/vector-icons';
 import Header from '../components/Header';
 import ScanButton from '../components/ScanButton';
 import { loadTensorflowModel } from 'react-native-fast-tflite';
+import { checkDomain, extractLogits } from '../services/embeddingService';
 import * as ImageManipulator from 'expo-image-manipulator';
 import * as FileSystem from 'expo-file-system/legacy';
 import jpeg from 'jpeg-js';
@@ -33,7 +34,6 @@ useEffect(() => {
       try {
         const tfModel = await loadTensorflowModel(require('../../assets/best_model_float16.tflite'));
         setModel(tfModel);
-        console.log("Modelo IA carregado");
       } catch (e) {
         console.error("Erro ao carregar modelo IA:", e);
       }
@@ -88,17 +88,30 @@ useEffect(() => {
   const classifyRock = async (imageUri) => {
     if (!model) {
       Alert.alert("Aviso", "O motor de IA ainda está carregando.");
-      return { rockName: "Modelo indisponível", confidence: 0 };
+      return { rockName: "Modelo indisponível", confidence: 0, outOfDomain: false };
     }
 
     try {
-      console.log("Iniciando conversão da imagem...");
       const inputTensor = await processImageToTensor(imageUri);
-      
-      console.log("Rodando IA...");
       const output = await model.run([inputTensor]);
       
-      const predictions = Array.from(output[0]); 
+      // Full output: [embedding(512) | logits(num_classes)]
+      const fullOutput = Array.from(output[0]);
+      
+      // ---- OOD Detection via embedding similarity ----
+      const domainCheck = checkDomain(fullOutput);
+      
+      if (!domainCheck.inDomain) {
+        return { 
+          rockName: "Fora do domínio", 
+          confidence: 0, 
+          outOfDomain: true,
+          similarity: Math.round(domainCheck.maxSimilarity * 100)
+        };
+      }
+      
+      // ---- Classification (only if in-domain) ----
+      const predictions = extractLogits(fullOutput);
       
       const maxLogit = Math.max(...predictions);
       const expScores = predictions.map(x => Math.exp(x - maxLogit));
@@ -120,12 +133,11 @@ useEffect(() => {
       ];
       
       const pedraDetectada = ROCK_CLASSES[maxIndex] || "Rocha não identificada";
-      console.log("Resultado da IA:", pedraDetectada, confidence);
       
-      return { rockName: pedraDetectada, confidence };
+      return { rockName: pedraDetectada, confidence, outOfDomain: false };
     } catch (error) {
       console.error("Erro na inferência:", error);
-      return { rockName: "Erro na análise", confidence: 0 };
+      return { rockName: "Erro na análise", confidence: 0, outOfDomain: false };
     }
   };
   
@@ -142,6 +154,7 @@ useEffect(() => {
         image: photo.uri,
         rockName: result.rockName,
         confidence: result.confidence,
+        outOfDomain: result.outOfDomain || false,
         source: 'camera',
         fromScan: true,
         fromCatalog: false,
@@ -182,6 +195,7 @@ useEffect(() => {
         image: uri,
         rockName: resultClassification.rockName,
         confidence: resultClassification.confidence,
+        outOfDomain: resultClassification.outOfDomain || false,
         source: 'gallery',
         fromScan: true,
         fromCatalog: false,
