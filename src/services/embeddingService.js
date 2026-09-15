@@ -71,10 +71,23 @@ export function checkDomain(modelOutput) {
   let bestClassIdx = 0;
 
   for (let i = 0; i < centroids.length; i++) {
-    const sim = cosineSimilarity(embedding, centroids[i]);
-    if (sim > maxSimilarity) {
-      maxSimilarity = sim;
-      bestClassIdx = i;
+    const classEntry = centroids[i];
+
+    // Suporte a múltiplos protótipos por classe (Fase 2) e centroide único (legado)
+    if (Array.isArray(classEntry) && Array.isArray(classEntry[0])) {
+      for (let p = 0; p < classEntry.length; p++) {
+        const sim = cosineSimilarity(embedding, classEntry[p]);
+        if (sim > maxSimilarity) {
+          maxSimilarity = sim;
+          bestClassIdx = i;
+        }
+      }
+    } else {
+      const sim = cosineSimilarity(embedding, classEntry);
+      if (sim > maxSimilarity) {
+        maxSimilarity = sim;
+        bestClassIdx = i;
+      }
     }
   }
 
