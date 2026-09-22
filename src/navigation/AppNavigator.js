@@ -1,4 +1,5 @@
 import React from 'react';
+import { View, ActivityIndicator } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import { Ionicons } from '@expo/vector-icons';
@@ -7,6 +8,10 @@ import { Ionicons } from '@expo/vector-icons';
 import HomeScreen from '../screens/HomeScreen';
 import ScanScreen from '../screens/ScanScreen';
 import ResultScreen from '../screens/ResultScreen';
+import RegisterScreen from '../screens/RegisterScreen';
+
+// Import context
+import { useUserProfile } from '../services/UserProfileContext';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -37,23 +42,6 @@ const ScanStack = () => {
   );
 };
 
-// Main app navigator with tabs and shared screens
-const AppNavigator = () => {
-  return (
-    <Stack.Navigator
-      screenOptions={{
-        headerShown: false,
-      }}
-    >
-      {/* Tab Navigator as the main interface */}
-      <Stack.Screen name="Tabs" component={TabNavigator} />
-      
-      {/* Shared screens that can be accessed from any tab */}
-      <Stack.Screen name="Result" component={ResultScreen} />
-    </Stack.Navigator>
-  );
-};
-
 // Tab navigator contained within the main stack
 const TabNavigator = () => {
   return (
@@ -78,6 +66,32 @@ const TabNavigator = () => {
       <Tab.Screen name="Home" component={HomeStack} />
       <Tab.Screen name="Scan" component={ScanStack} />
     </Tab.Navigator>
+  );
+};
+
+// Main app navigator with conditional initial route based on user profile
+const AppNavigator = () => {
+  const { hasProfile, isLoadingProfile } = useUserProfile();
+
+  if (isLoadingProfile) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#f5f5f5' }}>
+        <ActivityIndicator size="large" color="#2E7D32" />
+      </View>
+    );
+  }
+
+  return (
+    <Stack.Navigator
+      initialRouteName={hasProfile ? 'Tabs' : 'Register'}
+      screenOptions={{
+        headerShown: false,
+      }}
+    >
+      <Stack.Screen name="Register" component={RegisterScreen} />
+      <Stack.Screen name="Tabs" component={TabNavigator} />
+      <Stack.Screen name="Result" component={ResultScreen} />
+    </Stack.Navigator>
   );
 };
 

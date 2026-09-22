@@ -34,6 +34,7 @@ useEffect(() => {
       try {
         const tfModel = await loadTensorflowModel(require('../../assets/best_model_float16.tflite'));
         setModel(tfModel);
+        console.log("Modelo IA carregado");
       } catch (e) {
         console.error("Erro ao carregar modelo IA:", e);
       }
@@ -92,7 +93,10 @@ useEffect(() => {
     }
 
     try {
+      console.log("Iniciando conversão da imagem...");
       const inputTensor = await processImageToTensor(imageUri);
+      
+      console.log("Rodando IA...");
       const output = await model.run([inputTensor]);
       
       // Full output: [embedding(512) | logits(num_classes)]
@@ -100,8 +104,10 @@ useEffect(() => {
       
       // ---- OOD Detection via embedding similarity ----
       const domainCheck = checkDomain(fullOutput);
+      console.log(`Verificação de domínio: sim=${domainCheck.maxSimilarity.toFixed(3)}, threshold=${domainCheck.threshold}, inDomain=${domainCheck.inDomain}`);
       
       if (!domainCheck.inDomain) {
+        console.log("Imagem fora do domínio detectada — não é uma rocha conhecida.");
         return { 
           rockName: "Fora do domínio", 
           confidence: 0, 
@@ -133,6 +139,7 @@ useEffect(() => {
       ];
       
       const pedraDetectada = ROCK_CLASSES[maxIndex] || "Rocha não identificada";
+      console.log("Resultado da IA:", pedraDetectada, confidence, `(sim=${domainCheck.maxSimilarity.toFixed(3)})`);
       
       return { rockName: pedraDetectada, confidence, outOfDomain: false };
     } catch (error) {
@@ -177,7 +184,7 @@ useEffect(() => {
     }
 
     let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ['images'],
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       aspect: [4, 3],
       quality: 1,

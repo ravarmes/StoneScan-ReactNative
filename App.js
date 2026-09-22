@@ -5,6 +5,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import AppNavigator from './src/navigation/AppNavigator';
 import { ScanHistoryProvider } from './src/services/ScanHistoryContext';
 import { UserRatingsProvider } from './src/services/UserRatingsContext';
+import { UserProfileProvider } from './src/services/UserProfileContext';
 import { warmupFirestore, syncPendingFeedbacks } from './src/services/firebase';
 
 export default function App() {
@@ -18,14 +19,16 @@ export default function App() {
 
   return (
     <NavigationContainer>
-      <ScanHistoryProvider>
-        <UserRatingsProvider>
-          <SafeAreaProvider>
-            <AppNavigator />
-            <StatusBar style="auto" />
-          </SafeAreaProvider>
-        </UserRatingsProvider>
-      </ScanHistoryProvider>
+      <UserProfileProvider>
+        <ScanHistoryProvider>
+          <UserRatingsProvider>
+            <SafeAreaProvider>
+              <AppNavigator />
+              <StatusBar style="auto" />
+            </SafeAreaProvider>
+          </UserRatingsProvider>
+        </ScanHistoryProvider>
+      </UserProfileProvider>
     </NavigationContainer>
   );
 }

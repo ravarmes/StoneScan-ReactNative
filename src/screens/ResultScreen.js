@@ -12,6 +12,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import Header from '../components/Header';
 import { useScanHistory } from '../services/ScanHistoryContext';
+import { useUserProfile } from '../services/UserProfileContext';
 import { sendFeedback } from '../services/firebase';
 
 const rockDetails = {
@@ -294,6 +295,7 @@ const ResultScreen = ({ route, navigation }) => {
     }
   };
 
+  const { userProfile } = useUserProfile();
   const confInfo = getConfidenceInfo(confidence);
 
   const handleFeedbackChoice = async (choice) => {
@@ -303,7 +305,8 @@ const ResultScreen = ({ route, navigation }) => {
       rockName,
       feedback: choice,
       confidence,
-      source: source || 'camera'
+      source: source || 'camera',
+      userProfile,
     });
   };
 
