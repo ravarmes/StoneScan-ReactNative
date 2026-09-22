@@ -11,7 +11,7 @@
   ],
   "embedding_dim": 512,
   "n_prototypes_per_class": 3,
-  "threshold": 0.914,
+  "threshold": 0.78,
   "calibration_info": {
     "metric": "cosine_similarity",
     "percentile_used": 5.0,
