@@ -15,6 +15,7 @@ import { Ionicons } from '@expo/vector-icons';
 import Header from '../components/Header';
 import RockCard from '../components/RockCard';
 import { useScanHistory } from '../services/ScanHistoryContext';
+import { useUserProfile } from '../services/UserProfileContext';
 
 // Mock data for rocks
 const rockData = [
@@ -139,6 +140,7 @@ const RatingStars = ({ rating }) => {
 
 const HomeScreen = ({ navigation }) => {
   const [activeTab, setActiveTab] = useState('catalog');
+  const { userProfile } = useUserProfile();
   
   // Usar o contexto de histórico
   const { scanHistory, isLoading, removeScanFromHistory, clearHistory } = useScanHistory();
@@ -299,6 +301,25 @@ const HomeScreen = ({ navigation }) => {
     <SafeAreaView style={styles.container}>
       <Header title="StoneScan" />
       
+      {userProfile && (
+        <View style={styles.userBanner}>
+          <View style={styles.userInfo}>
+            <Text style={styles.greetingText}>Olá, {userProfile.name ? userProfile.name.split(' ')[0] : 'Usuário'}! 👋</Text>
+            <Text style={styles.userRoleText}>
+              {userProfile.isRockProfessional ? 'Especialista em Rochas' : 'Entusiasta'}
+            </Text>
+          </View>
+          <TouchableOpacity 
+            style={styles.editProfileButton}
+            onPress={() => navigation.navigate('Register')}
+            activeOpacity={0.7}
+          >
+            <Ionicons name="person-circle-outline" size={18} color="#2E7D32" />
+            <Text style={styles.editProfileText}>Meu Perfil</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
       <View style={styles.tabContainer}>
         <TouchableOpacity 
           style={[styles.tab, activeTab === 'catalog' && styles.activeTab]}
@@ -499,6 +520,47 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginTop: 4,
+  },
+  userBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: '#fff',
+    marginHorizontal: 16,
+    marginTop: 12,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#e8e8e8',
+  },
+  userInfo: {
+    flex: 1,
+  },
+  greetingText: {
+    fontSize: 15,
+    fontWeight: 'bold',
+    color: '#222',
+  },
+  userRoleText: {
+    fontSize: 12,
+    color: '#2E7D32',
+    fontWeight: '500',
+    marginTop: 2,
+  },
+  editProfileButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#E8F5E9',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 16,
+  },
+  editProfileText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#2E7D32',
+    marginLeft: 4,
   },
 });
 

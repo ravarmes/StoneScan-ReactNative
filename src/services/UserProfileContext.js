@@ -68,7 +68,7 @@ export const UserProfileProvider = ({ children }) => {
         await AsyncStorage.removeItem(USER_PROFILE_PENDING_KEY);
       }
 
-      return { success: true, profile };
+      return { success: true, profile, sentOnline: sent };
     } catch (error) {
       console.error('Erro ao salvar perfil:', error);
       return { success: false, error };

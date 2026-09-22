@@ -18,19 +18,28 @@ import { useUserProfile } from '../services/UserProfileContext';
 const GENDER_OPTIONS = [
   { id: 'masculino', label: 'Masculino' },
   { id: 'feminino', label: 'Feminino' },
-  { id: 'outro', label: 'Outro' },
   { id: 'nao_informar', label: 'Prefiro não dizer' },
 ];
 
 const RegisterScreen = ({ navigation }) => {
-  const { saveProfile } = useUserProfile();
+  const { userProfile, saveProfile } = useUserProfile();
 
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [age, setAge] = useState('');
-  const [gender, setGender] = useState('masculino');
-  const [isRockProfessional, setIsRockProfessional] = useState(false);
+  const [name, setName] = useState(userProfile?.name || '');
+  const [email, setEmail] = useState(userProfile?.email || '');
+  const [age, setAge] = useState(userProfile?.age ? String(userProfile.age) : '');
+  const [gender, setGender] = useState(userProfile?.gender || 'masculino');
+  const [isRockProfessional, setIsRockProfessional] = useState(Boolean(userProfile?.isRockProfessional));
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  React.useEffect(() => {
+    if (userProfile) {
+      setName(userProfile.name || '');
+      setEmail(userProfile.email || '');
+      setAge(userProfile.age ? String(userProfile.age) : '');
+      setGender(userProfile.gender || 'masculino');
+      setIsRockProfessional(Boolean(userProfile.isRockProfessional));
+    }
+  }, [userProfile]);
 
   const handleSubmit = async () => {
     const trimmedName = name.trim();
@@ -64,13 +73,21 @@ const RegisterScreen = ({ navigation }) => {
       });
 
       if (result.success) {
-        navigation.replace('Tabs');
+        if (result.sentOnline) {
+          Alert.alert(
+            'Sucesso!',
+            'Seu cadastro foi salvo e sincronizado com o Firebase!',
+            [{ text: 'OK', onPress: () => navigation.replace('Tabs') }]
+          );
+        } else {
+          Alert.alert(
+            'Salvo no Dispositivo',
+            'O cadastro foi salvo localmente e será enviado ao Firebase assim que a conexão for estabelecida.',
+            [{ text: 'OK', onPress: () => navigation.replace('Tabs') }]
+          );
+        }
       } else {
-        Alert.alert(
-          'Aviso',
-          'Não foi possível salvar o perfil online no momento, mas o cadastro foi salvo no dispositivo.',
-          [{ text: 'OK', onPress: () => navigation.replace('Tabs') }]
-        );
+        Alert.alert('Erro', 'Não foi possível concluir o cadastro no momento.');
       }
     } catch (error) {
       console.error('Erro ao submeter cadastro:', error);
@@ -180,9 +197,6 @@ const RegisterScreen = ({ navigation }) => {
             {/* Pergunta: É da área de rochas? */}
             <View style={styles.inputGroup}>
               <Text style={styles.label}>Você atua na área de rochas ou geologia?</Text>
-              <Text style={styles.helpText}>
-                Ajuda a calibrar e validar as avaliações técnicas de rochas ornamentais.
-              </Text>
               <View style={styles.radioRow}>
                 <TouchableOpacity
                   style={[
@@ -203,7 +217,7 @@ const RegisterScreen = ({ navigation }) => {
                       isRockProfessional && styles.radioLabelSelected,
                     ]}
                   >
-                    Sim, sou da área
+                    Sim
                   </Text>
                 </TouchableOpacity>
 
@@ -226,7 +240,7 @@ const RegisterScreen = ({ navigation }) => {
                       !isRockProfessional && styles.radioLabelSelected,
                     ]}
                   >
-                    Não / Entusiasta
+                    Não
                   </Text>
                 </TouchableOpacity>
               </View>

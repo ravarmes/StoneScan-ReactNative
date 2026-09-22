@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const FIREBASE_PROJECT_ID = process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID || "stonescan-fe353";
-const FIREBASE_API_KEY = process.env.EXPO_PUBLIC_FIREBASE_API_KEY || "";
+const FIREBASE_API_KEY = process.env.EXPO_PUBLIC_FIREBASE_API_KEY || "AIzaSyCPCPhq0NWAnGWbKdmokpwH3HHH4zT1uw0";
 const FEEDBACK_QUEUE_KEY = "@stoneScan:feedback_queue";
 const USER_PROFILE_PENDING_KEY = "@stoneScan:user_profile_pending";
 
@@ -45,6 +45,10 @@ export const saveUserProfileToFirestore = async (profile) => {
     });
 
     clearTimeout(timeoutId);
+    if (!response.ok) {
+      const errText = await response.text();
+      console.error(`[FB] Erro Firestore (users/${profile.id}): Status ${response.status}`, errText);
+    }
     return response.ok;
   } catch (err) {
     clearTimeout(timeoutId);
@@ -96,6 +100,10 @@ const sendPayloadToFirestore = async (payload) => {
     });
 
     clearTimeout(timeoutId);
+    if (!response.ok) {
+      const errText = await response.text();
+      console.error(`[FB] Erro Firestore (feedbacks/${docId}): Status ${response.status}`, errText);
+    }
     return response.ok;
   } catch (err) {
     clearTimeout(timeoutId);
