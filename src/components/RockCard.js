@@ -44,15 +44,11 @@ const RockCard = ({ name, image, category, rating, onPress, isRecommendation = f
       <View style={styles.categoryBadge}>
         <Text style={styles.categoryText}>{category}</Text>
       </View>
-      {!isRecommendation && (
-        <View style={styles.ratingBadge}>
-          {renderStars()}
-        </View>
-      )}
       <View style={styles.content}>
         <Text style={styles.name} numberOfLines={1}>
           {formatRockName(name)}
         </Text>
+        {!isRecommendation && renderStars()}
       </View>
     </TouchableOpacity>
   );
@@ -85,15 +81,6 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     borderRadius: 12,
   },
-  ratingBadge: {
-    position: 'absolute',
-    bottom: 40,
-    right: 8,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
   categoryText: {
     color: '#fff',
     fontSize: 12,
@@ -110,6 +97,7 @@ const styles = StyleSheet.create({
   ratingContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginTop: 4,
   },
 });
 
